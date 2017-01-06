@@ -45,6 +45,27 @@ div.content {
             clear: both
         }
     }
+    div.statistics{
+        font-size: 12px;
+        position: fixed;
+        right: 32px;
+        bottom: 32px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 4px 6px;
+        border-radius: 4px;
+        background-color: #1581D9;
+        color: white;
+        box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+        div.result{
+            padding-right: 16px;
+        }
+        span.number{
+            font-size: 14px;
+            padding: 0 12px;
+        }
+    }
 }
 
 </style>
@@ -96,6 +117,14 @@ div.content {
             {{'列表内容 ' + o }}
         </div>
     </el-card>
+
+    <div class="statistics">
+        <div class="result">
+            共<span class="number">2</span>个仓库
+            共<span class="number">28989</span>本书
+        </div>
+        <el-button type="success" size="small" icon="plus">添加仓库</el-button>
+    </div>
 </div>
 
 </template>
