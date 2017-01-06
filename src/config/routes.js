@@ -14,5 +14,9 @@ export default [{
         name: 'shelves',
         path: 'shelves',
         component: require('../pages/board/store/shelves')
+    }, {
+        name: 'store_check',
+        path: 'store_check',
+        component: require('../pages/board/store/store_check')
     }]
 }]
