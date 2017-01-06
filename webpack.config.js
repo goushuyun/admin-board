@@ -52,7 +52,16 @@ module.exports = {
         },
         extensions: ['', '.js', '.vue']
     },
-    devtool: '#eval-source-map'
+    devtool: '#eval-source-map',
+    // webpack-dev-server CLI
+    devServer: {
+        proxy: {
+            '/v1/*': {
+                target: 'http://127.0.0.1:10013/',
+                secure: false
+            }
+        }
+    }
 }
 
 if (process.env.NODE_ENV === 'production') {

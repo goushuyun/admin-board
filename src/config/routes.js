@@ -1,6 +1,3 @@
-import App from '../App'
-
-
 export default [{
     path: '/',
     name: 'index',
@@ -11,6 +8,6 @@ export default [{
     component: require('../pages/board'),
     children: [{
         path: 'demo',
-        component: require('../pages/board/demo/demo')
+        component: require('../pages/board/addBooks/addBooks')
     }]
 }]

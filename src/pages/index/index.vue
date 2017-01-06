@@ -11,11 +11,14 @@
 
 div#loginBox{
     margin-top: -56px;
-    padding: 24px;
+    padding: 6px 24px 24px;
     border-radius: 6px;
     background-color: white;
     width: 300px;
-
+    .logo{
+        margin: 0 auto;
+        display: block;
+    }
     .el-input{
         padding-bottom: 12px;
     }
@@ -29,26 +32,59 @@ div#loginBox{
 <template lang="html">
     <div class="container">
         <div id="loginBox">
+            <img class="logo" src="../../images/logo.jpg" alt="">
             <el-input v-model="tel" placeholder="手机号码" autofocus></el-input>
             <el-input v-model="password" placeholder="密码"></el-input>
-            <el-button class="login_btn" type="primary" @click="login">登录</el-button>
+            <el-button class="login_btn" :loading="btn_loading" type="primary" @click="login">登录</el-button>
         </div>
     </div>
 </template>
 
 <script>
+import {testMobile, testPassword} from '../../scripts/utils'
+import store from '../../store'
+
 
 export default {
     data(){
         return {
-            tel: '',
-            password: ''
+            tel: '18817953402',
+            password: '052zhuan055',
+            btn_loading: false
         }
+    },
+    mounted(){
+        //remove adminInfo
+        localStorage.removeItem('adminInfo')
     },
     methods: {
         login(){
-            console.log(this.tel + '----' + this.password)
-            this.$router.push({name: 'admin'})
+            //校验手机号码格式
+            if(!testMobile(this.tel)){
+                this.$message.error('手机号码格式不正确！')
+                return
+            }
+            //check password
+            if(!testPassword(this.password)){
+                this.$message.error('密码格式不正确！');
+                return
+            }
+            this.btn_loading = true
+            this.$http.post('/v1/admin/login', {
+                tel: this.tel,
+                password: this.password
+            }).then(resp=>{
+                if(resp.data.code == '00000'){
+                    //login success
+                    this.$router.push({name: 'admin'})
+                    localStorage.setItem("adminInfo", JSON.stringify(resp.data.data))
+                }else if (resp.data.code == '11001'){
+                    //user not found
+                    this.$message.error("用户名或密码错误")
+                }
+                this.btn_loading = false
+            })
+
         }
     }
 }

@@ -1,9 +1,10 @@
 <style lang="scss" scoped>
-.el-menu{
+
+.el-menu {
     border-radius: 0;
 }
 
-#top_bar{
+#top_bar {
     position: fixed;
     top: 0;
     left: 180px;
@@ -14,14 +15,14 @@
     }
 }
 
-#left_bar{
+#left_bar {
     position: fixed;
     width: 180px;
     top: 0;
     left: 0;
     bottom: 0;
     background-color: #324057;
-    .title{
+    .title {
         line-height: 60px;
         text-align: center;
         color: #C0CCDA;
@@ -29,13 +30,14 @@
     }
 }
 
-#content{
+#content {
     position: fixed;
     top: 60px;
     left: 180px;
     right: 0;
     bottom: 0;
-    background-color: #efefef;
+    background-color: white;
+    padding: 32px 16px;
 }
 
 </style>
@@ -44,26 +46,38 @@
 
 <div>
     <div id="top_bar">
-        <el-menu theme="dark" mode="horizontal" class="top_menu">
+        <el-menu theme="dark" mode="horizontal" class="top_menu" :router="true">
             <el-submenu index="2">
-                <template slot="title">王凯</template>
-                <el-menu-item index="2-1">退出</el-menu-item>
+                <template slot="title">{{adminName}}</template>
+                <el-menu-item index="/">退出</el-menu-item>
             </el-submenu>
             <el-menu-item index="3">订单管理</el-menu-item>
         </el-menu>
     </div>
 
     <div id="left_bar">
-        <h3 class="title">上海应用技术大学</h3>
+        <h3 class="title">{{shopName}}</h3>
         <el-menu theme="dark" mode="vertical" :router="true">
-            <el-menu-item index="/admin/demo">订单管理</el-menu-item>
+            <el-submenu index="1">
+                <template slot="title">
+                    <i class="el-icon-menu"></i>图书上架
+                </template>
+                <el-menu-item index="/admin/demo">ISBN搜索入库</el-menu-item>
+                <el-menu-item index="2-2">Excel上传入库</el-menu-item>
+            </el-submenu>
+            <el-submenu index="2">
+                <template slot="title">
+                    <i class="el-icon-menu"></i>库存管理
+                </template>
+                <el-menu-item index="/admin/demo">货架管理</el-menu-item>
+                <el-menu-item index="2-2">库存查看</el-menu-item>
+            </el-submenu>
         </el-menu>
     </div>
 
     <div id="content">
-        <router-view>
+        <router-view></router-view>
     </div>
-
 
 </div>
 
@@ -71,7 +85,27 @@
 
 <script>
 
+import store from '../../store'
+
 export default {
+    data() {
+            return {
+                shopName: '',
+                adminName: ''
+            }
+        },
+        mounted() {
+            var adminInfo = JSON.parse(localStorage.getItem('adminInfo'))
+            if (adminInfo == null) {
+                this.$router.push({
+                    name: 'index'
+                })
+                return
+            } else {
+                this.shopName = adminInfo.shop.shop_name
+                this.adminName = adminInfo.admin_name
+            }
+        }
 }
 
 </script>

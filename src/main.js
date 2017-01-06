@@ -11,7 +11,22 @@ var App = require('./App')
 const router = new VueRouter({
     routes
 })
-new Vue({
-    render: h => h(App),
-    router
-}).$mount('#app')
+
+//setting Vuex
+var app = new Vue({
+    el: '#app',
+    router,
+    name,
+    render: h => h(App)
+})
+
+// create axios instance
+import Axios from 'axios'
+
+var axios = Axios.create({
+    headers: {
+        'Content-Type': 'application/json'
+    }
+})
+
+Vue.prototype.$http = axios
