@@ -29,4 +29,45 @@ var axios = Axios.create({
     }
 })
 
+axios.interceptors.request.use(config=>{
+    let token = localStorage.getItem('token')
+
+    console.log('The token is : ' + token)
+
+    if(token != null){
+        config.headers['Authorization'] = 'Bearer ' + token
+    }
+    return config
+}, error=>{
+    return Promise.reject(error)
+})
+
+axios.interceptors.response.use(function(response) {
+    //update JWT
+    var jwt_token = response.headers['x-jwt-token']
+    if(jwt_token != undefined){
+        localStorage.setItem('token', jwt_token)
+    }
+
+    //relogin
+    if(response.data.code == '11014'){
+        app.$router.push({
+            name: 'index'
+        })
+    }
+
+
+    //handler error
+    if(response.data.code != '00000'){
+        //call RPC 过程中缺少字段
+        app.$message.error(response.data.message)
+        return new Error(response.data.message)
+    }
+    return response;
+}, function(error) {
+    // Do something with response error
+    return Promise.reject(error);
+});
+
+
 Vue.prototype.$http = axios

@@ -56,6 +56,7 @@ export default {
     mounted(){
         //remove adminInfo
         localStorage.removeItem('adminInfo')
+        localStorage.removeItem('token')
     },
     methods: {
         login(){
@@ -76,8 +77,13 @@ export default {
             }).then(resp=>{
                 if(resp.data.code == '00000'){
                     //login success
+
+                    //put token into localStorage
+                    localStorage.setItem("token", resp.data.data.token)
+                    //put adminInfo into admin
+                    localStorage.setItem('adminInfo', JSON.stringify(resp.data.data))
+
                     this.$router.push({name: 'admin'})
-                    localStorage.setItem("adminInfo", JSON.stringify(resp.data.data))
                 }else if (resp.data.code == '11001'){
                     //user not found
                     this.$message.error("用户名或密码错误")
