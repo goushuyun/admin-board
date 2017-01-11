@@ -78,11 +78,11 @@ div.content {
             <el-row>
                 <el-col :span="14" style="text-align: left;">
                     <span style="line-height: 36px;" v-show="!(store.id==show_ele_id)">{{store.name}}</span>
-                    <el-input @blur="input_blur(store.id, store.name, index)" v-model="store.name" size="small" class="edit-input" v-show="store.id==show_ele_id" :autofocus="true"></el-input>
+                    <el-input @blur="input_blur(store.id, store.name, index, 'store')" v-model="store.name" size="small" class="edit-input" v-show="store.id==show_ele_id" :autofocus="true"></el-input>
                 </el-col>
                 <el-col :span="10" class="btns" style="text-align: right;">
                     <el-button-group style="float: right;">
-                        <el-button type="primary" icon="plus" size="small" @click="addShelf(store.shelves)"></el-button>
+                        <el-button type="primary" icon="plus" size="small" @click="addShelf(store.shelves, store.id)"></el-button>
                         <el-button type="success" icon="edit" size="small" @click="editTitle(store.id)" v-show="!(store.id == show_ele_id)"></el-button>
                         <el-button type="success" icon="circle-check" size="small" @click="input_blur(store.id, index)" v-show="store.id == show_ele_id"></el-button>
                         <el-button type="danger" icon="delete" size="small" @click="deleteStore(index, store.id)"></el-button>
@@ -92,7 +92,7 @@ div.content {
         </div>
         <div v-for="(shelf, index) in store.shelves" class="text item">
             <span class="text" v-show="!(shelf.id==show_ele_id)">{{shelf.name}}</span>
-            <el-input size="small" v-model.trim="shelf.name" class="shelve_input" v-show="shelf.id==show_ele_id" @blur="input_blur" :autofocus="true"></el-input>
+            <el-input size="small" v-model.trim="shelf.name" class="shelve_input" v-show="shelf.id==show_ele_id" @blur="shelf_input_blur(shelf)" :autofocus="true"></el-input>
             <span class="operation">
                 <i class="el-icon-edit" @click="editTitle(shelf.id)"></i>
                 <i class="el-icon-delete" @click="delShelves(index, store)"></i>
@@ -102,7 +102,7 @@ div.content {
 
     <div class="statistics">
         <div class="result">
-            共<span class="number">2</span>个仓库
+            共<span class="number">{{stores.length}}</span>个仓库
             共<span class="number">28989</span>本书
         </div>
         <el-button @click="addStore" type="success" size="small" icon="plus">添加仓库</el-button>
@@ -112,45 +112,30 @@ div.content {
 </template>
 
 <script>
-
+import axios from "../../../scripts/http"
 export default {
     mounted(){
-        console.log('mounted')
+        axios.post('/v1/store/listStores', {}).then((resp)=>{
+            this.stores = resp.data.data
+        })
     },
     data(){
         return{
-            stores: [{
-                name: '小仓库',
-                id: '234223',
-                shelves: [{
-                    name: '一号货架',
-                    id: '467'
-                }, {
-                    name: '一号货架',
-                    id: '4567'
-                }]
-            }, {
-                name: '小仓库',
-                id: '23423423',
-                shelves: [{
-                    name: '一号货架',
-                    id: '45sdf67'
-                }, {
-                    name: '一号货架',
-                    id: '4562317'
-                }]
-            }],
+            stores: [],
             show_ele_id: ''
         }
     },
     methods:{
         delShelves(index, store){
-            store.shelves.splice(index, 1)
+            axios.post('/v1/store/delShelf', {id: store.shelves[index].id}).then(resp=>{
+                store.shelves.splice(index, 1)
+            })
         },
-        addShelf(shelves){
+        addShelf(shelves, id){
             let temp = {
-                name: '王凯。。。',
-                id: ''
+                name: '',
+                id: '',
+                store_id: id
             }
             shelves.push(temp)
         },
@@ -161,10 +146,13 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(()=>{
-                this.stores.splice(index, 1)
-                this.$message({
-                    type: 'success',
-                    message: '删除成功！'
+                //do http request to delete store
+                axios.post('/v1/store/delStore', {id: id}).then(resp=>{
+                    this.stores.splice(index, 1)
+                    this.$message({
+                        type: 'success',
+                        message: '删除成功！'
+                    })
                 })
             }).catch(()=>{
                 console.log('cancel')
@@ -179,29 +167,46 @@ export default {
             }
             this.stores.unshift(temp)
         },
-        input_blur(id, name, index){
+        shelf_input_blur(shelf){
+            if(shelf.name == ''){
+                this.$message({
+                    message:'库位名称未填写！',
+                    type: 'warning'
+                })
+                return
+            }
+            if(shelf.id == ''){
+                //add shelf name
+                axios.post('/v1/store/addShelf', {name: shelf.name, store_id: shelf.store_id}).then(resp=>{
+                    shelf.id = resp.data.id
+                })
+            }else{
+                //update shelf name
+                axios.post('/v1/store/updateShelf', {name: shelf.name, id: shelf.id}).then(resp=>{
+                })
+            }
+            this.show_ele_id = '';
+        },
+        input_blur(id, name, index, type){
+            if(name == ''){
+                this.$message({
+                    message:'仓库名称未填写！',
+                    type: 'warning'
+                })
+                return
+            }
             //bind blur event, and update store name by id
-
             if(id == ''){
                 //add new store
-                if(name == ''){
-                    this.$message({
-                        message:'仓库名称未填写！',
-                        type: 'warning'
-                    })
-                    return
-                }
-                this.$http.post('/v1/store/addStore', {name: name}).then((resp)=>{
+                axios.post('/v1/store/addStore', {name: name}).then(resp=>{
                     this.stores[index].id = resp.data.data.id
                 })
             }else{
                 //update store name
-                this.$http.post('/v1/store/updateStore', {name: name, id: id}).then(resp=>{
+                axios.post('/v1/store/updateStore', {name: name, id: id}).then(resp=>{
                     console.log(resp)
                 })
             }
-
-            console.log(id, index)
             this.show_ele_id = ''
         },
         editTitle(id){

@@ -42,8 +42,7 @@ div#loginBox{
 
 <script>
 import {testMobile, testPassword} from '../../scripts/utils'
-import store from '../../store'
-
+import axios from "../../scripts/http"
 
 export default {
     data(){
@@ -71,7 +70,7 @@ export default {
                 return
             }
             this.btn_loading = true
-            this.$http.post('/v1/admin/login', {
+            axios.post('/v1/admin/login', {
                 tel: this.tel,
                 password: this.password
             }).then(resp=>{
