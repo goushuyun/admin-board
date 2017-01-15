@@ -8,4 +8,10 @@ function testPassword(pwd){
     return pwdReg.test(pwd)
 }
 
-export {testMobile, testPassword}
+function getTimeVal(){
+    var date = new Date()
+    return date.getSeconds()
+}
+
+
+export {testMobile, testPassword, getTimeVal}

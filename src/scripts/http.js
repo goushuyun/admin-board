@@ -27,9 +27,7 @@ axios.interceptors.response.use(function(response) {
     }
     //relogin
     if(response.data.code == '11014'){
-        app.$router.push({
-            name: 'index'
-        })
+        window.location.href = "http://localhost:8086/#/"
     }
     //handler error
     if(response.data.code != '00000'){
