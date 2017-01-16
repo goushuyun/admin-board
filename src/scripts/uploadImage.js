@@ -19,7 +19,7 @@ export default {
 
             iframe.onload = (e) => {
                 //加载完成之后，前端切换显示上传的图片
-                this.book.pic = "http://ojrjlwt2h.bkt.clouddn.com/" + this.book.isbn + "?" + getTimeVal()
+                this.ruleForm.pic = "http://ojrjlwt2h.bkt.clouddn.com/" + this.ruleForm.isbn + "?" + getTimeVal()
                 iframe.parentNode.removeChild(iframe);
                 iframe = null;
             }

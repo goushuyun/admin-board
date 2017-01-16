@@ -128,6 +128,8 @@ export default {
                 selling_price: 0
             },
 
+            preBook: {},
+
             categories: [],
             stores: [],
             shelves: [],
@@ -199,7 +201,7 @@ export default {
                     sellingBook.category = this.ruleForm.category
                     sellingBook.amount = this.ruleForm.amount
                     sellingBook.type = this.ruleForm.type
-                    sellingBook.selling_price = this.ruleForm.selling_price
+                    sellingBook.selling_price = this.ruleForm.selling_price * 100
                     sellingBook.shelf_id = this.ruleForm.shelf_id
                     sellingBook.store_id = this.ruleForm.store_id
 
@@ -208,6 +210,25 @@ export default {
                         console.log(resp.data)
                     })
 
+                    //封装 book
+                    let book = {}
+                    book.title = this.ruleForm.title
+                    book.publisher = this.ruleForm.publisher
+                    book.isbn = this.ruleForm.isbn
+                    book.pic = this.ruleForm.pic
+                    book.author = this.ruleForm.author
+                    book.price_int = this.ruleForm.price*100
+
+                    //检查标准图书信息是否有变化
+
+                    console.log('------' + this.preBook.title != book.title + '----------')
+
+                    if(this.preBook.title != book.title || this.preBook.publisher != book.publisher || this.preBook.pic != book.pic || this.preBook.author != book.author || parseInt(this.preBook.price) != book.price_int){
+                        axios.post('/v1/books/updateBookInfo', book).then(resp=>{
+                            console.log(resp.data)
+                        })
+                    }
+
 
 
                 } else {
@@ -215,23 +236,6 @@ export default {
                     return false;
                 }
             });
-
-
-
-            //封装 book
-            let book = {}
-            book.title = this.ruleForm.title
-            book.publisher = this.ruleForm.publisher
-            book.isbn = this.ruleForm.isbn
-            book.pic = this.ruleForm.pic
-            book.author = this.ruleForm.author
-            book.price = this.ruleForm.price
-
-            console.log(book)
-
-
-            //封装 sellingBook
-
 
         },
         fileChange() {
@@ -256,6 +260,10 @@ export default {
                 isbn: this.ruleForm.isbn
             }).then(resp => {
                 let book = resp.data.data
+
+                //对返回图书信息做copy，以便将来比对
+                this.preBook = book
+
                 this.ruleForm.title = book.title
                 this.ruleForm.publisher = book.publisher
                 this.ruleForm.pic = book.pic
@@ -269,7 +277,7 @@ export default {
             //获取token
             axios.post('/v1/mediastore/getUpToken', {
                 zone: 1,
-                key: this.book.isbn
+                key: this.ruleForm.isbn
             }).then(resp => {
                 this.token = resp.data.data.token
             })
