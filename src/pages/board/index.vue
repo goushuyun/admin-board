@@ -71,7 +71,7 @@
                     <i class="el-icon-menu"></i>库存管理
                 </template>
                 <el-menu-item index="/admin/shelves">货架管理</el-menu-item>
-                <el-menu-item index="store_check">库存查看</el-menu-item>
+                <el-menu-item index="/admin/store_check">库存查看</el-menu-item>
             </el-submenu>
         </el-menu>
     </div>

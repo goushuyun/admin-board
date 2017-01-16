@@ -8,8 +8,7 @@ div.content {
             margin-top: 36px;
         }
     }
-
-    .pagination{
+    .pagination {
         margin-top: 12px;
         text-align: right;
     }
@@ -36,7 +35,7 @@ div.content {
                 </el-select>
             </el-form-item>
             <el-form-item class="btn_bottom">
-                <el-button type="primary">查询
+                <el-button type="primary" @click="getData">查询
                     <i class="el-icon-search"></i>
                 </el-button>
             </el-form-item>
@@ -44,20 +43,22 @@ div.content {
     </div>
 
     <div class="data_table">
-        <el-table :data="tableData" style="width: 100%">
+        <el-table :data="tableData" stripe style="width: 100%">
+            <el-table-column type="index" width="50" label="">
+            </el-table-column>
             <el-table-column prop="isbn" label="ISBN" width="150">
             </el-table-column>
-            <el-table-column prop="title" label="书名" width="170">
+            <el-table-column prop="book.title" label="书名" width="170">
             </el-table-column>
             <el-table-column prop="amount" label="数量" width="80">
             </el-table-column>
-            <el-table-column prop="price" label="原价" width="80">
+            <el-table-column prop="book.price" label="原价" width="80">
             </el-table-column>
-            <el-table-column prop="type" label="类型" width="80">
+            <el-table-column prop="typeName" label="类型" width="80">
             </el-table-column>
-            <el-table-column prop="price_selling" label="售价" width="80">
+            <el-table-column prop="selling_price" label="售价" width="80">
             </el-table-column>
-            <el-table-column prop="position" label="位置" width="180">
+            <el-table-column prop="address" label="位置" width="180">
             </el-table-column>
             <el-table-column prop="update_time" label="最新入库时间" width="150">
             </el-table-column>
@@ -79,49 +80,44 @@ div.content {
 
 <script>
 
+import axios from "../../../scripts/http"
 export default {
     data() {
-        return {
-            type: '',
-            tableData: [{
-                isbn: '9787122087935',
-                title: '线性代数',
-                amount: '234',
-                type: '新书',
-                price: '23.00',
-                price_selling: '12.00',
-                position: '大仓库--3号架',
-                update_time: '2016-3-23 23:34'
-            }, {
-                isbn: '9787122087935',
-                title: '线性代数',
-                amount: '234',
-                type: '新书',
-                price: '23.00',
-                price_selling: '12.00',
-                position: '大仓库--3号架',
-                update_time: '2016-3-23 23:34'
-            }, {
-                isbn: '9787122087935',
-                title: '线性代数',
-                amount: '234',
-                type: '新书',
-                price: '23.00',
-                price_selling: '12.00',
-                position: '大仓库--3号架',
-                update_time: '2016-3-23 23:34'
-            }, {
-                isbn: '9787122087935',
-                title: '线性代数',
-                amount: '234',
-                type: '新书',
-                price: '23.00',
-                price_selling: '12.00',
-                position: '大仓库--3号架',
-                update_time: '2016-3-23 23:34'
-            }]
+            return {
+                type: '',
+                tableData: []
+            }
+        },
+        mounted() {
+            axios.post("/v1/books/checkStore", {
+                page: 1,
+                size: 10
+            }).then(resp => {
+                this.tableData = resp.data.data.map((sellingBook, imdex)=>{
+                    sellingBook.address = sellingBook.store.name + '--' + sellingBook.shelf.name
+                    sellingBook.typeName = sellingBook.type == 1? '新书':'二手书'
+                    sellingBook.selling_price = (sellingBook.selling_price/100).toFixed(2)
+                    return sellingBook
+                })
+            })
+        },
+        methods: {
+            getData() {
+                axios.post("/v1/books/checkStore", {
+                    page: 1,
+                    size: 10
+                }).then(resp => {
+                    console.log('kaiaki')
+
+                    console.log(resp.data.data)
+
+                    this.tableData = resp.data.data
+                    console.log(this.tableData)
+                })
+
+            }
         }
-    }
+
 }
 
 </script>
