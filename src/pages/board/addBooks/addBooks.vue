@@ -1,4 +1,5 @@
 <style lang="scss" scoped>
+
 div.left {
     display: inline-block;
     padding-left: 12px;
@@ -29,18 +30,19 @@ div.right {
         text-align: center;
     }
 }
+
 </style>
 
 <template lang="html">
 
-<div class="content">
+<div class="content" v-loading="loading" :element-loading-text="loading_text">
     <div class="left">
         <form id="upload_form" action="http://upload.qiniu.com/" method="post" enctype="multipart/form-data">
             <input id="imageFile" v-show="false" name="file" type="file" accept="image/*" @change="fileChange">
             <input type="hidden" name="key" :value="ruleForm.isbn">
             <input type="hidden" name="token" :value="token">
             <img class="book_img" :src="ruleForm.pic" alt="" />
-            <el-button id="change_image_btn" class="changePic" @click="changePic" :disabled="ruleForm.title == ''">更换图片</el-button>
+            <el-button id="change_image_btn" class="changePic" @click="changePic" :disabled="ruleForm.isbn == ''">更换图片</el-button>
         </form>
     </div>
     <div class="right">
@@ -50,7 +52,7 @@ div.right {
                     <el-button @click="search" slot="append" icon="search"></el-button>
                 </el-input>
             </el-form-item>
-            <el-form-item label="书名"  prop="title">
+            <el-form-item label="书名" prop="title">
                 <el-input v-model.trim="ruleForm.title"></el-input>
             </el-form-item>
             <el-form-item label="出版社" prop="publisher">
@@ -94,7 +96,7 @@ div.right {
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" :disabled="ruleForm.title == ''" @click="pullIOnSale('ruleForm')">上架销售</el-button>
-                <el-button>重置</el-button>
+                <el-button @click="reset('ruleForm')">重置</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -103,6 +105,7 @@ div.right {
 </template>
 
 <script>
+
 import axios from "../../../scripts/http"
 import uploadImage from "../../../scripts/uploadImage"
 import enumVals from "../../../scripts/enum"
@@ -110,6 +113,8 @@ export default {
     mixins: [uploadImage],
     data() {
         return {
+            loading: false,
+            loading_text: '正在搜索',
             ruleForm: {
                 //book
                 isbn: '',
@@ -191,97 +196,120 @@ export default {
         console.log(this.categories)
     },
     methods: {
+        reset(formName){
+            this.$refs[formName].resetFields();
+        },
         pullIOnSale(ruleForm) {
-            //校验必填字段
-            this.$refs[ruleForm].validate((valid) => {
-                if (valid) {
-                    //封装 sellingBook , 向后端传值
-                    let sellingBook = {}
-                    sellingBook.isbn = this.ruleForm.isbn
-                    sellingBook.category = this.ruleForm.category
-                    sellingBook.amount = this.ruleForm.amount
-                    sellingBook.type = this.ruleForm.type
-                    sellingBook.selling_price = this.ruleForm.selling_price * 100
-                    sellingBook.shelf_id = this.ruleForm.shelf_id
-                    sellingBook.store_id = this.ruleForm.store_id
+                //校验必填字段
+                this.$refs[ruleForm].validate((valid) => {
+                    if (valid) {
+                        this.loading = true
+                        this.loading_text = '正在上架'
 
-                    //图书上架
-                    axios.post('/v1/books/pullOnSale', sellingBook).then(resp=>{
-                        console.log(resp.data)
-                    })
+                        //封装 sellingBook , 向后端传值
+                        let sellingBook = {}
+                        sellingBook.isbn = this.ruleForm.isbn
+                        sellingBook.category = this.ruleForm.category
+                        sellingBook.amount = this.ruleForm.amount
+                        sellingBook.type = this.ruleForm.type
+                        sellingBook.selling_price = parseInt(this.ruleForm.selling_price * 100)
+                        sellingBook.shelf_id = this.ruleForm.shelf_id
+                        sellingBook.store_id = this.ruleForm.store_id
 
-                    //封装 book
-                    let book = {}
-                    book.title = this.ruleForm.title
-                    book.publisher = this.ruleForm.publisher
-                    book.isbn = this.ruleForm.isbn
-                    book.pic = this.ruleForm.pic
-                    book.author = this.ruleForm.author
-                    book.price_int = this.ruleForm.price*100
-
-                    //检查标准图书信息是否有变化
-
-                    console.log('------' + this.preBook.title != book.title + '----------')
-
-                    if(this.preBook.title != book.title || this.preBook.publisher != book.publisher || this.preBook.pic != book.pic || this.preBook.author != book.author || parseInt(this.preBook.price) != book.price_int){
-                        axios.post('/v1/books/updateBookInfo', book).then(resp=>{
+                        //图书上架
+                        axios.post('/v1/books/pullOnSale', sellingBook).then(resp => {
+                            this.loading = false
                             console.log(resp.data)
+
+                            this.$message("上架成功！")
+
                         })
+
+                        //封装 book
+                        let book = {}
+                        book.title = this.ruleForm.title
+                        book.publisher = this.ruleForm.publisher
+                        book.isbn = this.ruleForm.isbn
+                        book.pic = this.ruleForm.pic
+                        book.author = this.ruleForm.author
+                        book.price_int = parseInt(this.ruleForm.price * 100)
+
+                        //检查标准图书信息是否有变化
+
+                        console.log('------' + this.preBook.title != book.title + '----------')
+
+                        if (this.preBook.title != book.title || this.preBook.publisher != book.publisher || this.preBook.pic != book.pic || this.preBook.author != book.author || parseInt(this.preBook.price) != book.price_int) {
+                            axios.post('/v1/books/updateBookInfo', book).then(resp => {
+                                // 上架成功
+                                this.reset('ruleForm')  //清空字段
+                                this.ruleForm.pic = ''      //clear pic
+                                console.log(resp.data)
+                            })
+                        }
+
+                    } else {
+                        console.log('error submit!!');
+                        return false;
                     }
+                });
 
+            },
+            fileChange() {
+                this.submitUploadForm()
+            },
+            chooseShelf() {
 
+            },
+            chooseStore() {
+                this.ruleForm.shelf_id = ''
+                let store_id = this.ruleForm.store_id
+                    //update shelf array
+                this.stores.forEach((store, index) => {
+                    if (store.id == store_id) {
+                        this.shelves = this.stores[index].shelves
+                        return
+                    }
+                })
+            },
+            search() {
+                this.loading_text = '正在搜索'
+                this.loading = true
+                axios.post('/v1/books/getBookInfo', {
+                    isbn: this.ruleForm.isbn
+                }).then(resp => {
+                    if (resp.data.message == 'book_not_found') {
+                        this.loading = false
+                        this.$message({
+                            message: '很抱歉，没有找到这本书，请自行录入信息',
+                            type: 'warning'
+                        })
+                        return
+                    }
+                    let book = resp.data.data
 
-                } else {
-                    console.log('error submit!!');
-                    return false;
-                }
-            });
+                    //对返回图书信息做copy，以便将来比对
+                    this.preBook = book
+                    this.ruleForm.title = book.title
+                    this.ruleForm.publisher = book.publisher
+                    this.ruleForm.pic = book.pic
+                    this.ruleForm.price = (book.price_int / 100).toFixed(2)
+                    this.ruleForm.author = book.author
 
-        },
-        fileChange() {
-            this.submitUploadForm()
-        },
-        chooseShelf() {
+                    this.loading = false
+                })
+            },
+            changePic() {
+                $('#imageFile').click()
 
-        },
-        chooseStore() {
-            this.ruleForm.shelf_id = ''
-            let store_id = this.ruleForm.store_id
-            //update shelf array
-            this.stores.forEach((store, index) => {
-                if (store.id == store_id) {
-                    this.shelves = this.stores[index].shelves
-                    return
-                }
-            })
-        },
-        search() {
-            axios.post('/v1/books/getBookInfo', {
-                isbn: this.ruleForm.isbn
-            }).then(resp => {
-                let book = resp.data.data
-
-                //对返回图书信息做copy，以便将来比对
-                this.preBook = book
-
-                this.ruleForm.title = book.title
-                this.ruleForm.publisher = book.publisher
-                this.ruleForm.pic = book.pic
-                this.ruleForm.price = (book.price_int / 100).toFixed(2)
-                this.ruleForm.author = book.author
-            })
-        },
-        changePic() {
-            $('#imageFile').click()
-
-            //获取token
-            axios.post('/v1/mediastore/getUpToken', {
-                zone: 1,
-                key: this.ruleForm.isbn
-            }).then(resp => {
-                this.token = resp.data.data.token
-            })
-        }
+                //获取token
+                axios.post('/v1/mediastore/getUpToken', {
+                    zone: 1,
+                    key: this.ruleForm.isbn
+                }).then(resp => {
+                    this.token = resp.data.data.token
+                })
+            }
     }
 }
+
 </script>

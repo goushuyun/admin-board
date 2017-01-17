@@ -1,5 +1,4 @@
 <style lang="scss">
-
 div.content {
     .btn_bottom {
         height: 72px;
@@ -13,7 +12,6 @@ div.content {
         text-align: right;
     }
 }
-
 </style>
 
 <template lang="html">
@@ -22,16 +20,16 @@ div.content {
     <div class="search_item">
         <el-form :inline="true">
             <el-form-item label="书名">
-                <el-input></el-input>
+                <el-input v-model="title"></el-input>
             </el-form-item>
             <el-form-item label="ISBN">
-                <el-input></el-input>
+                <el-input v-model="isbn"></el-input>
             </el-form-item>
             <el-form-item label="图书类型">
-                <el-select v-model="type">
-                    <el-option label="新书" value="shanghai"></el-option>
-                    <el-option label="二手书" value="beijing"></el-option>
-                    <el-option label="所有" value="bejing"></el-option>
+                <el-select v-model="type" @change="changeType">
+                    <el-option label="新书" :value="1"></el-option>
+                    <el-option label="二手书" :value="2"></el-option>
+                    <el-option label="所有" :value="0"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item class="btn_bottom">
@@ -42,9 +40,9 @@ div.content {
         </el-form>
     </div>
 
-    <div class="data_table">
+    <div class="data_table" v-loading="loading" element-loading-text="拼命加载中">
         <el-table :data="tableData" stripe style="width: 100%">
-            <el-table-column type="index" width="50" label="">
+            <el-table-column type="index" width="56" label="">
             </el-table-column>
             <el-table-column prop="isbn" label="ISBN" width="150">
             </el-table-column>
@@ -52,7 +50,7 @@ div.content {
             </el-table-column>
             <el-table-column prop="amount" label="数量" width="80">
             </el-table-column>
-            <el-table-column prop="book.price" label="原价" width="80">
+            <el-table-column prop="book.price_int" label="原价" width="80">
             </el-table-column>
             <el-table-column prop="typeName" label="类型" width="80">
             </el-table-column>
@@ -60,7 +58,7 @@ div.content {
             </el-table-column>
             <el-table-column prop="address" label="位置" width="180">
             </el-table-column>
-            <el-table-column prop="update_time" label="最新入库时间" width="150">
+            <el-table-column prop="update_at" label="最新入库时间" width="150">
             </el-table-column>
             <el-table-column label="操作">
                 <template scope="scope">
@@ -71,7 +69,7 @@ div.content {
     </div>
 
     <div class="pagination">
-        <el-pagination :page-sizes="[100, 200, 300, 400]" :page-size="100" layout="total, sizes, prev, pager, next, jumper" :total="400">
+        <el-pagination :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange">
         </el-pagination>
     </div>
 </div>
@@ -79,45 +77,64 @@ div.content {
 </template>
 
 <script>
-
+//setting filter
+import {stamp2date} from '../../../scripts/utils'
 import axios from "../../../scripts/http"
 export default {
     data() {
-            return {
-                type: '',
-                tableData: []
-            }
+        return {
+            total: 0,
+
+            page: 1,
+            size: 10,
+            title: '',
+            isbn: '',
+            type: 0,
+            tableData: [],
+            loading: false
+        }
+    },
+    mounted() {
+        this.getData()
+    },
+    methods: {
+        changeType(){
+            this.getData()
         },
-        mounted() {
+        handleSizeChange(size){
+            this.size = size
+            this.getData()
+        },
+        handleCurrentChange(page){
+            this.page = page
+            this.getData()
+        },
+        getData() {
+            this.loading = true
             axios.post("/v1/books/checkStore", {
-                page: 1,
-                size: 10
+                page: this.page,
+                size: this.size,
+                type: this.type,
+                title: this.title,
+                isbn: this.isbn
             }).then(resp => {
-                this.tableData = resp.data.data.map((sellingBook, imdex)=>{
+                let data = resp.data
+
+                this.tableData = data.data.map((sellingBook, imdex) => {
                     sellingBook.address = sellingBook.store.name + '--' + sellingBook.shelf.name
-                    sellingBook.typeName = sellingBook.type == 1? '新书':'二手书'
-                    sellingBook.selling_price = (sellingBook.selling_price/100).toFixed(2)
+                    sellingBook.typeName = sellingBook.type == 1 ? '新书' : '二手书'
+                    sellingBook.selling_price = (sellingBook.selling_price / 100).toFixed(2)
+                    sellingBook.book.price_int = (sellingBook.book.price_int / 100).toFixed(2)
+                    sellingBook.update_at = stamp2date(sellingBook.update_at, 'YYYY-MM-DD HH:mm')
                     return sellingBook
                 })
+
+                this.total = data.total
+
+                this.loading = false    //close loadinh state
             })
-        },
-        methods: {
-            getData() {
-                axios.post("/v1/books/checkStore", {
-                    page: 1,
-                    size: 10
-                }).then(resp => {
-                    console.log('kaiaki')
-
-                    console.log(resp.data.data)
-
-                    this.tableData = resp.data.data
-                    console.log(this.tableData)
-                })
-
-            }
         }
 
+    }
 }
-
 </script>

@@ -13,5 +13,13 @@ function getTimeVal(){
     return date.getSeconds()
 }
 
+function stamp2date(dt, fmt) {
+    if (dt === 0) {
+        return '';
+    }else{
+        return moment.unix(dt).format(fmt);
+    }
+}
 
-export {testMobile, testPassword, getTimeVal}
+
+export {testMobile, testPassword, getTimeVal, stamp2date}
