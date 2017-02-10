@@ -18,5 +18,9 @@ export default [{
         name: 'store_check',
         path: 'store_check',
         component: require('../pages/board/store/store_check')
+    }, {
+        name: 'shop_info',
+        path: 'shop_info',
+        component: require('../pages/board/shop/shop_info')
     }]
 }]

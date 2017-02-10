@@ -50,9 +50,9 @@
         <el-menu theme="dark" mode="horizontal" class="top_menu" :router="true">
             <el-submenu index="2">
                 <template slot="title">{{adminName}}</template>
+                <el-menu-item index="/admin/shop_info">店铺信息</el-menu-item>
                 <el-menu-item index="/">退出</el-menu-item>
             </el-submenu>
-            <el-menu-item index="3">订单管理</el-menu-item>
         </el-menu>
     </div>
 
