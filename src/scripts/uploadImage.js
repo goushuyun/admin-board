@@ -15,7 +15,7 @@ export default {
 
             iframe.onload = (e) => {
                 //加载完成之后，前端切换显示上传的图片
-                this.form.logo = "http://ojrfwndal.bkt.clouddn.com/shop/" + this.shop_id + "?" + getTimeVal()
+                this.form.logo = "http://ojrjlwt2h.bkt.clouddn.com//shop/" + this.shop_id + "?" + getTimeVal()
                 iframe.parentNode.removeChild(iframe);
                 iframe = null;
             }

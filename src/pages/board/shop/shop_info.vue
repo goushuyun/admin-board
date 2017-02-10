@@ -69,7 +69,7 @@ export default {
             }else{
                 console.log(this.form)
                 //上传修改后的商家信息
-                this.form.logo = 'http://ojrfwndal.bkt.clouddn.com/shop/' + this.shop_id
+                this.form.logo = 'http://ojrjlwt2h.bkt.clouddn.com//shop/' + this.shop_id
                 this.form.id = this.shop_id
                 let self = this
                 axios.post('/v1/admin/updateShopInfo', this.form).then(resp=>{
@@ -87,7 +87,7 @@ export default {
 
             //获取token
             axios.post('/v1/mediastore/getUpToken', {
-                zone: -1,
+                zone: 1,
                 key: 'shop/' + this.shop_id
             }).then(resp => {
                 this.token = resp.data.data.token
