@@ -73,6 +73,12 @@
                 <el-menu-item index="/admin/shelves">货架管理</el-menu-item>
                 <el-menu-item index="/admin/store_check">库存查看</el-menu-item>
             </el-submenu>
+            <el-submenu index="3">
+                <template slot="title">
+                    <i class="el-icon-menu"></i>订单查看
+                </template>
+                <el-menu-item index="/admin/orders_check">订单查看</el-menu-item>
+            </el-submenu>
         </el-menu>
     </div>
 

@@ -26,10 +26,17 @@ div.content {
                 <el-input v-model="isbn"></el-input>
             </el-form-item>
             <el-form-item label="图书类型">
-                <el-select v-model="type" @change="changeType">
+                <el-select v-model="type" @change="getData">
                     <el-option label="新书" :value="1"></el-option>
                     <el-option label="二手书" :value="2"></el-option>
                     <el-option label="所有" :value="0"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="库存数量">
+                <el-select v-model="max_number" @change="getData">
+                    <el-option label="有货" :value="0"></el-option>
+                    <el-option label="小于5" :value="5"></el-option>
+                    <el-option label="等于0" :value="1"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item class="btn_bottom">
@@ -85,6 +92,9 @@ export default {
         return {
             total: 0,
 
+
+            max_number: 0,
+
             page: 1,
             size: 10,
             title: '',
@@ -98,6 +108,9 @@ export default {
         this.getData()
     },
     methods: {
+        changeSearchNumber(){
+            console.log(this.max_number)
+        },
         changeType(){
             this.getData()
         },
@@ -116,7 +129,8 @@ export default {
                 size: this.size,
                 type: this.type,
                 title: this.title,
-                isbn: this.isbn
+                isbn: this.isbn,
+                max_number: this.max_number,
             }).then(resp => {
                 let data = resp.data
 
