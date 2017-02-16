@@ -33,10 +33,10 @@ div.content {
                 </el-select>
             </el-form-item>
             <el-form-item label="库存数量">
-                <el-select v-model="max_number" @change="getData">
-                    <el-option label="有货" :value="0"></el-option>
-                    <el-option label="小于5" :value="5"></el-option>
-                    <el-option label="等于0" :value="1"></el-option>
+                <el-select v-model="search_by_number" @change="changeSearchByNumber">
+                    <el-option label="有货" value="has"></el-option>
+                    <el-option label="小于5" value="little"></el-option>
+                    <el-option label="等于0" value="no"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item class="btn_bottom">
@@ -91,10 +91,10 @@ export default {
     data() {
         return {
             total: 0,
+            search_by_number: 'has',
 
-
+            min_number: 1,
             max_number: 0,
-
             page: 1,
             size: 10,
             title: '',
@@ -108,8 +108,20 @@ export default {
         this.getData()
     },
     methods: {
-        changeSearchNumber(){
-            console.log(this.max_number)
+        changeSearchByNumber(){
+
+            if(this.search_by_number == 'little'){
+                this.min_number = 0
+                this.max_number = 6
+            }else if (this.search_by_number == 'no'){
+                this.min_number = 0
+                this.max_number = 1
+            }else if (this.search_by_number == 'has'){
+                this.min_number = 0
+                this.max_number = 0
+            }
+            this.getData()
+
         },
         changeType(){
             this.getData()
@@ -131,6 +143,7 @@ export default {
                 title: this.title,
                 isbn: this.isbn,
                 max_number: this.max_number,
+                min_number: this.min_number
             }).then(resp => {
                 let data = resp.data
 
