@@ -26,5 +26,9 @@ export default [{
         name: 'orders_check',
         path: 'orders_check',
         component: require('../pages/board/orders/orders_check')
+    }, {
+        name: 'order_info',
+        path: 'order_info',
+        component: require('../pages/board/orders/order_info')
     }]
 }]
