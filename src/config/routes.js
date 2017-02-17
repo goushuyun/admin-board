@@ -26,5 +26,13 @@ export default [{
         name: 'orders_check',
         path: 'orders_check',
         component: require('../pages/board/orders/orders_check')
+    }, {
+        name: 'topic',
+        path: 'topic',
+        component: require('../pages/board/topic/topic')
+    }, {
+        name: 'promotion',
+        path: 'promotion',
+        component: require('../pages/board/topic/promotion')
     }]
 }]

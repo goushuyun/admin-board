@@ -104,13 +104,13 @@ table.order_items:hover {
             </el-col>
 
             <el-col :span="4">
-                <el-button type="primary" size="small">批量发货</el-button>
+                <el-button type="primary" size="small" @click="sendSelectedOrders">批量发货</el-button>
             </el-col>
 
         </el-row>
     </div>
 
-    <el-table :data="orders" border style="width: 100%" @selection-change="handleSelectionChange" stripe>
+    <el-table :data="orders" border style="width: 100%" @selection-change="handleSelectionChange" stripe v-loading="loading" element-loading-text="拼命加载中">
         <el-table-column type="selection" width="55">
         </el-table-column>
         <el-table-column label="订单号" width="160" prop="order_id">
@@ -139,7 +139,7 @@ table.order_items:hover {
             </template>
         </el-table-column>
 
-        <el-table-column label="退款">
+        <!-- <el-table-column label="退款">
             <template scope="scope">
                 <div v-if="scope.row.refund">
                     <p class="center" style="color: #FF4949">待退款</p>
@@ -151,7 +151,7 @@ table.order_items:hover {
                     </p>
                 </div>
             </template>
-        </el-table-column>
+        </el-table-column> -->
 
         <el-table-column label="收货人信息" min-width="140">
             <template scope="scope">
@@ -174,7 +174,8 @@ table.order_items:hover {
                         <el-button type="text" size="small">查看详情</el-button>
                     </p>
                     <p class="center">
-                        <el-button type="primary" size="mini" @click="sendOrder(scope.row.order_id)">发货</el-button>
+                        <el-button type="primary" size="mini" v-if="scope.row.order_status == 2" @click="sendOrder(scope.row.order_id, scope.$index)">发货</el-button>
+                        <el-button type="primary" size="mini" v-if="scope.row.order_status == 3" @click="completeOrder(scope.row.order_id, scope.$index)">交易完成</button>
                     </p>
                 </div>
             </template>
@@ -212,7 +213,10 @@ export default {
                 size: 10,
                 total: 0,
                 orders: [],
-                multipleSelection: [],
+
+                selected_orders: [],
+
+                loading: false,
 
                 pickerOptions2: {
                     shortcuts: [{
@@ -244,6 +248,41 @@ export default {
             }
         },
         methods: {
+            completeOrder(id, index){
+                this.loading = true
+
+                axios.post('/v1/orders/complete_orders', {order_ids: [id]}).then(resp=>{
+                    if(resp.data.code == '00000'){
+                        this.$message({
+                            type:'success',
+                            message: '订单' + id + '交易成功'
+                        })
+                        this.loading = false
+                    }
+                })
+
+            },
+            sendSelectedOrders(){
+                this.loading = true
+                var order_ids = this.selected_orders.map(el => {
+                    return el.order_id
+                })
+                console.log(order_ids)
+                axios.post('/v1/orders/send_orders', {order_ids}).then(resp => {
+
+                    if(resp.data.code == '00000'){
+                        this.$message({
+                            message: '订单批量发货成功',
+                            type: 'success'
+                        })
+                        this.getData()
+                        this.loading = false
+                    }
+
+                })
+            },
+
+
             handleSizeChange(size){
                 this.size = size
                 this.getData()
@@ -252,7 +291,9 @@ export default {
                 this.page = page
                 this.getData()
             },
-            sendOrder(order_id){
+            sendOrder(order_id, index){
+                this.loading = true
+
                 var order_ids = []
                 order_ids.push(order_id)
                 let data = {
@@ -261,7 +302,12 @@ export default {
                 axios.post('/v1/orders/send_orders', data).then(resp => {
                     if(resp.data.code == '00000') {
                         //发货成功
-                        console.log(resp.data)
+                        this.orders.splice(index, 1)
+                        this.$message({
+                            message: '订单 '+ order_id +' 已发货',
+                            type: 'success'
+                        })
+                        this.loading = false
                     }
                 })
             },
@@ -272,9 +318,15 @@ export default {
                 console.log(this.searchType)
             },
             handleSelectionChange(val) {
-                this.multipleSelection = val
+
+                this.selected_orders = val
+
+                console.log(val)
+
             },
             getData() {
+                this.loading = true
+
                 let data = {
                     page: this.page,
                     size: this.size
@@ -296,18 +348,15 @@ export default {
                             el.order_at_time = el.order_at.split(" ")[1]
 
                             //设置订单状态
-
-                            console.log('-------' + el.order_status + '------------')
-
                             el.order_status_name = enumList.order_status[el.order_status-1]
-
-                            console.log('---------' + el.order_status_name + '-----------')
 
                             if (el.pay_at != 0) {
                                 el.pay_at = moment.unix(el.pay_at).format('YYYY-MM-DD HH:mm:ss')
                             }
                             return el
                         })
+
+                        this.loading = false
                     }
 
                     console.log(resp.data)

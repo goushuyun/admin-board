@@ -79,6 +79,12 @@
                 </template>
                 <el-menu-item index="/admin/orders_check">订单查看</el-menu-item>
             </el-submenu>
+            <el-submenu index="4">
+                <template slot="title">
+                    <i class="el-icon-menu"></i>话题推荐
+                </template>
+                <el-menu-item index="/admin/topic">话题查看</el-menu-item>
+            </el-submenu>
         </el-menu>
     </div>
 
