@@ -236,8 +236,6 @@ export default {
 
                         //检查标准图书信息是否有变化
 
-                        console.log('------' + this.preBook.title != book.title + '----------')
-
                         if (this.preBook.title != book.title || this.preBook.publisher != book.publisher || this.preBook.pic != book.pic || this.preBook.author != book.author || parseInt(this.preBook.price) != book.price_int) {
                             axios.post('/v1/books/updateBookInfo', book).then(resp => {
                                 // 上架成功
