@@ -59,7 +59,7 @@ div.content {
             </el-table-column>
             <el-table-column prop="amount" label="数量" width="80">
             </el-table-column>
-            <el-table-column prop="book.price_int" label="原价" width="80">
+            <el-table-column prop="book.price_int" label="原价" min-width="90">
             </el-table-column>
             <el-table-column prop="typeName" label="类型" width="80">
             </el-table-column>
@@ -83,16 +83,16 @@ div.content {
     </div>
 
     <!-- 修改提示框 -->
-    <el-dialog title="收货地址" v-model="boxVisible" size="small">
+    <el-dialog title="修改库存信息" v-model="boxVisible" size="small">
         <el-form :model="dialog_goods" label-width="80px">
             <el-form-item label="书名">
                 {{dialog_book.title}}
             </el-form-item>
             <el-form-item label="售价">
-                <el-input v-model="dialog_goods.selling_price"></el-input>
+                <el-input v-model="dialog_goods.selling_price" min="0"></el-input>
             </el-form-item>
             <el-form-item label="数量">
-                <el-input v-model="dialog_goods.amount"></el-input>
+                <el-input-number  style="width:100%;" v-model="dialog_goods.amount" :min="0" :max="9999"></el-input-number>
             </el-form-item>
             <el-form-item label="位置">
                 <el-col :span="11">
@@ -154,7 +154,7 @@ export default {
                 btn_loading: false,
 
                 //选中弹出的模态框数据备份
-                backup_data: {}
+                backup_data: {},
             }
         },
         mounted() {
@@ -166,74 +166,90 @@ export default {
             })
         },
         methods: {
-            confirmModify(){
-                //检查数据是否更新
-                if(this.store_id != this.backup_data.store_id || this.shelf_id != this.backup_data.shelf_id || this.backup_data.amount != this.dialog_goods.amount || this.backup_data.selling_price != this.dialog_goods.selling_price){
-                    //数据有更新,封装更新数据，提交更新
-
-                    this.btn_loading = true
-
-                    let data = {
-                        id: this.dialog_goods.id,
-                        store_id: this.store_id,
-                        shelf_id: this.shelf_id,
-                        amount: this.dialog_goods.amount,
-                        selling_price: this.dialog_goods.selling_price*100
-                    }
-
-                    axios.post('/v1/books/modify_store_goods', data).then(res=>{
-                        if(res.data.code == '00000'){
-                            //更新成功
-                            this.boxVisible = false
-                            this.getData()
-                            this.btn_loading = false
-                        }
-                    })
-                }else {
-                    this.boxVisible = false
-                }
-
-            },
-            chooseStore() {
-                this.shelf_id = ''
-                let store_id = this.store_id
-
-                //update shelf array
-                this.stores.forEach((store, index) => {
-                    if (store.id == store_id) {
-                        this.shelves = this.stores[index].shelves
+            confirmModify() {
+                    //校验弹框中的数据，库位选填
+                    if ((typeof this.dialog_goods.selling_price) == 'string') {
+                        this.$message({
+                            message: '图书价格类型不正确',
+                            type: 'warning'
+                        });
                         return
                     }
-                })
 
-            },
 
-            modify(index) {
-                //数据备份
-                var modify_goods = this.tableData[index]
-                this.backup_data = modify_goods
+                    console.log(this.backup_data)
 
-                //整理渲染数据
-                this.dialog_goods = modify_goods
-                this.dialog_book = this.dialog_goods.book
+                    //检查数据是否更新
+                    if (this.store_id != this.backup_data.store_id || this.shelf_id != this.backup_data.shelf_id || this.backup_data.amount != this.dialog_goods.amount || this.backup_data.selling_price != this.dialog_goods.selling_price) {
+                        //数据有更新,封装更新数据，提交更新
 
-                this.boxVisible = true
+                        this.btn_loading = true
 
-                //填补所修改书籍的货架位置
-                this.store_id = this.dialog_goods.store_id
+                        let data = {
+                            id: this.dialog_goods.id,
+                            store_id: this.store_id,
+                            shelf_id: this.shelf_id,
+                            amount: this.dialog_goods.amount,
+                            selling_price: this.dialog_goods.selling_price * 100
+                        }
 
-                //update shelf array
-                for (var i = 0; i < this.stores.length; i++) {
-                    if(this.stores[i].id == this.store_id){
-                        this.shelves = this.stores[i].shelves
-                        break
+                        axios.post('/v1/books/modify_store_goods', data).then(res => {
+                            if (res.data.code == '00000') {
+                                //更新成功
+                                this.boxVisible = false
+                                this.getData()
+                                this.btn_loading = false
+                            }
+                        })
+                    } else {
+                        this.boxVisible = false
                     }
-                }
 
-                this.$nextTick(()=>{
-                    this.shelf_id = this.dialog_goods.shelf_id
-                })
-            },
+                },
+                chooseStore() {
+                    this.shelf_id = ''
+                    let store_id = this.store_id
+
+                    //update shelf array
+                    this.stores.forEach((store, index) => {
+                        if (store.id == store_id) {
+                            this.shelves = this.stores[index].shelves
+                            return
+                        }
+                    })
+
+                },
+
+                modify(index) {
+                    //数据备份
+                    var modify_goods = this.tableData[index]
+                    this.backup_data.id = modify_goods.id
+                    this.backup_data.selling_price = modify_goods.selling_price
+                    this.backup_data.amount = modify_goods.amount
+                    // this.backup_data.store_id = modify_goods.store_id
+                    // this.backup_data.shelf_id = modify_goods.shelf_id
+
+                    //整理渲染数据
+                    this.dialog_goods = modify_goods
+                    this.dialog_book = this.dialog_goods.book
+
+                    this.boxVisible = true
+
+                    //填补所修改书籍的货架位置
+                    this.store_id = this.dialog_goods.store_id
+
+                    //update shelf array
+                    for (var i = 0; i < this.stores.length; i++) {
+                        if (this.stores[i].id == this.store_id) {
+                            this.shelves = this.stores[i].shelves
+                            break
+                        }
+                    }
+
+                    this.$nextTick(() => {
+                        this.shelf_id = this.dialog_goods.shelf_id
+                    })
+                },
 
                 changeSearchByNumber() {
 
@@ -277,7 +293,7 @@ export default {
                         this.tableData = data.data.map((sellingBook, imdex) => {
                             sellingBook.address = sellingBook.store.name + '--' + sellingBook.shelf.name
                             sellingBook.typeName = sellingBook.type == 1 ? '新书' : '二手书'
-                            sellingBook.selling_price = (sellingBook.selling_price / 100).toFixed(2)
+                            sellingBook.selling_price = parseFloat((sellingBook.selling_price / 100).toFixed(2))
                             sellingBook.book.price_int = (sellingBook.book.price_int / 100).toFixed(2)
                             sellingBook.update_at = stamp2date(sellingBook.update_at, 'YYYY-MM-DD HH:mm')
                             return sellingBook
