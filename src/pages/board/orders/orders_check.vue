@@ -78,8 +78,8 @@ table.order_items:hover {
                     <el-option label="待发货" value="2"></el-option>
                     <el-option label="已发货" value="3"></el-option>
                     <el-option label="已完成" value="4"></el-option>
-                    <el-option label="待退款" value="6"></el-option>
-                    <el-option label="已退款" value="7"></el-option>
+                    <!-- <el-option label="待退款" value="6"></el-option>
+                    <el-option label="已退款" value="7"></el-option> -->
                     <el-option label="全部" value="0"></el-option>
                 </el-select>
             </el-form-item>
@@ -97,8 +97,8 @@ table.order_items:hover {
                     <el-radio-button label="2">待发货</el-radio-button>
                     <el-radio-button label="3">已发货</el-radio-button>
                     <el-radio-button label="4">已完成</el-radio-button>
-                    <el-radio-button label="6">待退款</el-radio-button>
-                    <el-radio-button label="7">已退款</el-radio-button>
+                    <!-- <el-radio-button label="6">待退款</el-radio-button>
+                    <el-radio-button label="7">已退款</el-radio-button> -->
                     <el-radio-button label="0">全部</el-radio-button>
                 </el-radio-group>
             </el-col>
@@ -171,7 +171,7 @@ table.order_items:hover {
                     <p class="center" v-if="scope.row.order_status == 5">已关闭</p>
 
                     <p class="center">
-                        <el-button type="text" size="small">查看详情</el-button>
+                        <el-button type="text" size="small" @click="viewDetial(scope.row.order_id)">查看详情</el-button>
                     </p>
                     <p class="center">
                         <el-button type="primary" size="mini" v-if="scope.row.order_status == 2" @click="sendOrder(scope.row.order_id, scope.$index)">发货</el-button>
@@ -248,6 +248,10 @@ export default {
             }
         },
         methods: {
+            viewDetial(order_id){
+                this.$router.push({name: 'order_info', params: {order_id}})
+            },
+
             completeOrder(id, index){
                 this.loading = true
 

@@ -125,7 +125,7 @@ export default {
 
             console.log(data)
 
-            axios.post('/v1/activity/addTopic', data).then(resp=>{
+            axios.post('/v1/activity/add_topic', data).then(resp=>{
                 //发布成功后，跳转到专题列表页面
                 if(resp.data.code == '00000'){
                     this.$router.push('topic')

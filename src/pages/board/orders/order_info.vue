@@ -1,6 +1,6 @@
 <style lang="scss" scoped>
 #body {
-    width: 1200px;
+    width: 100%;
 }
 #order_status {
     height: 100px;
@@ -21,7 +21,7 @@
         display: flex;
         justify-content: flex-start;
         .first-lable {
-            width: 70px;
+            width: 90px;
             text-align: right;
         }
     }
@@ -83,13 +83,13 @@
         <el-row :span="24">
             <el-col :span="12">
                 <div class="info_info">
-                    <label class="first-lable">收货人：</label><label>{{present_order.address_info.name}}</label>
+                    <label class="first-lable">收货人：</label><label>{{address_info.name}}</label>
                 </div>
                 <div class="info_info">
-                    <label class="first-lable">手机号码：</label><label>{{present_order.address_info.tel}}</label>
+                    <label class="first-lable">手机号码：</label><label>{{address_info.tel}}</label>
                 </div>
                 <div class="info_info">
-                    <label class="first-lable">收货地址：</label><label>{{present_order.address_info.address}}</label>
+                    <label class="first-lable">收货地址：</label><label>{{address_info.address}}</label>
                 </div>
                 <div class="info_info">
                     <label class="first-lable">买家备注：</label><label>{{present_order.remark}}</label>
@@ -126,11 +126,11 @@
           </el-table-column>
           <el-table-column prop="book_title" label="书名" width="300">
           </el-table-column>
-          <el-table-column prop="isbn" label="ISBN" width="300">
+          <el-table-column prop="isbn" label="ISBN" width="150">
           </el-table-column>
-          <el-table-column prop="publisher" label="出版社" width="200">
-          </el-table-column>
-          <el-table-column prop="book_price" label="售价" width="150">
+          <!-- <el-table-column prop="publisher" label="出版社" width="200">
+          </el-table-column> -->
+          <el-table-column prop="book_price" label="售价" width="100">
           </el-table-column>
           <el-table-column prop="number" label="数量">
           </el-table-column>
@@ -146,53 +146,18 @@
 </template>
 
 <script>
-import utils from '../../../scripts/utils'
+import {stamp2date} from '../../../scripts/utils'
+import axios from "../../../scripts/http"
 export default {
-    mounted() {
-        // this.loadingOrder(order_id)
+    created() {
+        let order_id = this.$route.params.order_id
+        this.loadingOrder(order_id)
     },
     data() {
         return {
-            present_order: {
-                user_id: "",
-                items: [{
-                    id: "934c780c-7352-4c2f-985f-eb9583c4510d",
-                    goods_id: "920c6ce1-bb17-49b6-b89c-dbb1b4d724bf",
-                    user_id: "",
-                    order_id: "",
-                    book_title: "Java编程思想 （第4版）",
-                    book_price: 5000, //书本价格
-                    number: 1, //下单数量
-                    type: 1,
-                    isbn: "9787111213826",
-                    book_image: "http://ojrjlwt2h.bkt.clouddn.com/9787550213524",
-                    publisher:"中信出版社",
-                    store_number: 0,
-                    current_store_number: 0,
-                    can_order: false
-                }],
-                address_info: {
-                    name: "此刻女",
-                    tel: "18817953402",
-                    address: "北京市门头沟区军庄镇门头沟军庄中心灰峪小学_欧诺",
-                    is_default: false,
-                    id: ""
-                },
-                school: "剑盟雅思预备学院",
-                order_id: "17021500000042", //订单号
-                total_price: 10000, //总价格
-                total_amount: 1, //总数量
-                client_ip: "",
-                remark: "",
-                freight: 600, //运费
-                shop_id: "",
-                openid: "",
-                trade_code: "4008842001201702150033874081", //交易号
-                pay_at: 1487175316, //支付时间
-                order_at: 1487146492, //下单时间
-                pay_status: 1,
-                order_status: 2
-            },
+            present_order: {},
+            address_info: {},
+
             order_status_description: ['', '待付款', '待发货', '已发货，待收货', '已完成']
         }
     },
@@ -203,20 +168,25 @@ export default {
             var data = {
                 page: 1, //页数   required
                 size: 10, //每页大小  required
-                order_id: order_id, //订单号   （获取某一订单的时候必传）
-                user_id: wx.getStorageSync('user').id //用户ID  required
+                order_id: order_id //订单号   （获取某一订单的时候必传）
             }
-            axios.post('/v1/orders/get_my_orders', data).then(resp =>{
+            axios.post('/v1/orders/listAllOrders', data).then(resp =>{
               if (resp.data.code == '00000') {
                 var present_order = resp.data.data[0]
+                console.log('-----------------')
+                console.log(present_order)
+                console.log('-----------------')
+
+                this.address_info = present_order.address_info
+
                 for (var i = 0; i < present_order.items.length; i++) {
                     present_order.items[i].book_price = (present_order.items[i].book_price / 100).toFixed(2)
                 }
                 present_order.total_price = (present_order.total_price / 100).toFixed(2)
                 present_order.freight = (present_order.freight / 100).toFixed(2)
 
-                present_order.order_at = utils.getTimeVal(present_order.order_at)
-                present_order.pay_at = utils.getTimeVal(present_order.pay_at)
+                present_order.order_at = stamp2date(present_order.order_at, 'YYYY-MM-DD HH:mm')
+                present_order.pay_at = stamp2date(present_order.pay_at, 'YYYY-MM-DD HH:mm')
                 self.present_order = present_order
               }
             })
