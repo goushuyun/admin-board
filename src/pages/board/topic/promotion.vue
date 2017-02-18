@@ -136,6 +136,11 @@ export default {
 
         updateTopicGoods(goods){
             console.log(goods)
+            axios.post('/v1//activity/update_topic_goods', goods).then(resp=>{
+                if(resp.data.code == '00000'){
+                    this.$message('操作成功！')
+                }
+            })
         },
 
         changeStatus(index){
@@ -147,7 +152,7 @@ export default {
                     recommend: this.goods[index].recommend,
                     goods_id: this.goods[index].id,
                     topic_id: this.topic_id,
-                    operate_type: ''
+                    operate_type: 'update'
                 }
                 this.updateTopicGoods(topic_goods)
             }
@@ -160,7 +165,7 @@ export default {
                 let topic_goods = {
                     recommend: false,
                     goods_id: this.goods[index].id,
-                    topic_id: '',
+                    topic_id: 'delete',
                     operate_type: 'reduce'
                 }
 

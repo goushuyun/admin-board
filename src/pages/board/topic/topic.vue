@@ -28,7 +28,7 @@
             <template scope="scope">
                 <el-button-group size="small">
                       <el-button size="small" type="success" icon="edit" @click="editTopic(scope.row.id)"></el-button>
-                      <el-button size="small" type="primary">更改推荐状态</el-button>
+                      <el-button size="small" type="primary" @click="updateTopicStatus(scope.row.id)">更改推荐状态</el-button>
                       <el-button size="small" type="danger" icon="delete" @click="deleteTopic(scope.row.id)"></el-button>
                 </el-button-group>
             </template>
@@ -49,6 +49,17 @@ export default {
 
 
     methods: {
+        updateTopicStatus(id){
+            axios.post('/v1/activity/update_topic_status', {id}).then(resp=>{
+
+                if(resp.data.code == '00000'){
+                    this.$message('状态更改成功！')
+                    this.getShopTopic()
+                }
+
+            })
+        },
+
         getShopTopic(){
             axios.post('/v1/activity/list_topics', {}).then(resp=> {
                 this.topics = resp.data.data

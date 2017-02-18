@@ -34,7 +34,7 @@ export default [{
         name: 'promotion',
         path: 'promotion',
         component: require('../pages/board/topic/promotion')
-    },
+    },{
         name: 'order_info',
         path: 'order_info',
         component: require('../pages/board/orders/order_info')
