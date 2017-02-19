@@ -67,12 +67,18 @@
 <div id="body">
     <div id="order_status">
         <el-row type="flex" justify="center" align="middle">
-            <el-col :span="24">
-                <el-steps :space="100" :active="present_order.order_status" finish-status="success" center align-center>
-                    <el-step title="卖家下单"></el-step>
-                    <el-step title="买家付款"></el-step>
-                    <el-step title="发货"></el-step>
-                    <el-step title="确认收货"></el-step>
+            <el-col :span="24" v-if="present_order.order_status<5">
+                <el-steps :space="200" :active="present_order.order_status" finish-status="success" center align-center>
+                    <el-step title="买家下单" :description="present_order.order_at==0?'':present_order.order_at"></el-step>
+                    <el-step title="买家付款" :description="present_order.pay_at==0?'':present_order.pay_at"></el-step>
+                    <el-step title="发货" :description="present_order.send_at==0?'':present_order.send_at"></el-step>
+                    <el-step title="确认收货" :description="present_order.accept_at==0?'':present_order.accept_at"></el-step>
+                </el-steps>
+            </el-col>
+            <el-col :span="24" v-if="present_order.order_status==5">
+                <el-steps :space="200" :active="2" finish-status="process" center align-center>
+                    <el-step title="买家下单" :description="present_order.order_at"></el-step>
+                    <el-step title="已关闭" :description="present_order.close_at==0?'':present_order.close_at"></el-step>
                 </el-steps>
             </el-col>
         </el-row>
@@ -112,7 +118,7 @@
                     <label class="first-lable">操作：</label><label><el-button type="info" size="small"  @click="sendOrder(present_order.order_id)">发货</el-button></label>
                 </div>
                 <div class="info_info" v-if="present_order.order_status==3">
-                    <label class="first-lable">操作：</label><label><el-button type="danger" size="small"  @click="checkCompleteOrder(present_order.order_id)">关闭订单</el-button></label>
+                    <label class="first-lable">操作：</label><label><el-button type="danger" size="small"  @click="checkCompleteOrder(present_order.order_id)">交易完成</el-button></label>
                 </div>
             </el-col>
         </el-row>
@@ -161,7 +167,7 @@ export default {
             present_order: {},
             address_info: {},
 
-            order_status_description: ['', '待付款', '待发货', '已发货，待收货', '已完成']
+            order_status_description: ['', '待付款', '待发货', '已发货，待收货', '已完成','已关闭']
         }
     },
     methods: {
@@ -204,6 +210,9 @@ export default {
 
                 present_order.order_at = stamp2date(present_order.order_at, 'YYYY-MM-DD HH:mm')
                 present_order.pay_at = stamp2date(present_order.pay_at, 'YYYY-MM-DD HH:mm')
+                present_order.send_at = stamp2date(present_order.send_at, 'YYYY-MM-DD HH:mm')
+                present_order.accept_at = stamp2date(present_order.accept_at, 'YYYY-MM-DD HH:mm')
+                present_order.close_at = stamp2date(present_order.close_at, 'YYYY-MM-DD HH:mm')
                 self.present_order = present_order
               }
             })
