@@ -198,7 +198,7 @@ export default {
 
                 this.updateTopicGoods(topic_goods)
             }
-            
+
         },
 
         search(){
