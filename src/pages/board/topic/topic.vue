@@ -27,7 +27,7 @@
         <el-table-column label="操作">
             <template scope="scope">
                 <el-button-group size="small">
-                      <el-button size="small" type="success" icon="edit" @click="editTopic(scope.row.id)"></el-button>
+                      <el-button size="small" type="success" icon="edit" @click="editTopic(scope.$index)"></el-button>
                       <el-button size="small" type="primary" @click="updateTopicStatus(scope.row.id)">更改推荐状态</el-button>
                       <el-button size="small" type="danger" icon="delete" @click="deleteTopic(scope.row.id)"></el-button>
                 </el-button-group>
@@ -63,13 +63,14 @@ export default {
         getShopTopic(){
             axios.post('/v1/activity/list_topics', {}).then(resp=> {
                 this.topics = resp.data.data
-
                 console.log(resp.data)
             })
         },
 
-        editTopic(topic_id){
-            this.$router.push({name: 'promotion', params: {topic_id}})
+        editTopic(index){
+            let topic = this.topics[index]
+
+            this.$router.push({name: 'promotion', params: {topic_id: topic.id, recommend: topic.recommend}})
         },
 
 

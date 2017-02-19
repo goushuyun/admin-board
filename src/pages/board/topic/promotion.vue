@@ -66,7 +66,13 @@ import axios from "../../../scripts/http"
 
 export default {
     created(){
+        //拿到话题的ID，推荐状态
         let topic_id = this.$route.params.topic_id
+        let recommend = this.$route.params.recommend
+
+        console.log(topic_id + '-----' + recommend)
+
+
 
         if (topic_id == undefined){
             //新加topic
@@ -75,7 +81,7 @@ export default {
 
         }else{
             this.topic_id = topic_id
-
+            this.recommend = recommend
             //编辑话题，获取该话题的说有商品数据
             console.log('the topic_id is ' + topic_id)
             let data = {
@@ -104,7 +110,7 @@ export default {
     methods: {
         //检查该商品是否符合设置为未推荐状态的标准(所有书籍均为未推荐)
         TopicIsRecommend(){
-            this.goods.some(el => {
+            return this.goods.some(el => {
                 return el.recommend == true
             })
         },
@@ -150,7 +156,7 @@ export default {
             })
 
             //检查是否需要更新话题状态
-            if(!this.TopicIsRecommend()&& this.topic_id != ''){
+            if(!this.TopicIsRecommend() && this.recommend == true){
                 //更新话题状态
                 axios.post('/v1/activity/update_topic_status', {id: this.topic_id}).then(resp=>{
 
@@ -159,8 +165,8 @@ export default {
                     }
 
                 })
-
             }
+
         },
 
         changeStatus(index){
@@ -179,6 +185,7 @@ export default {
 
         },
         delGoods(index){
+            this.goods.splice(index, 1)
 
             if(this.topic_id != ''){
                 //删除已有话题的部分商品
@@ -191,8 +198,7 @@ export default {
 
                 this.updateTopicGoods(topic_goods)
             }
-
-            this.goods.splice(index, 1)
+            
         },
 
         search(){

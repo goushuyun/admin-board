@@ -37,8 +37,8 @@ div.content {
             <el-form-item label="库存数量">
                 <el-select v-model="search_by_number" @change="changeSearchByNumber">
                     <el-option label="有货" value="has"></el-option>
-                    <el-option label="小于5" value="little"></el-option>
-                    <el-option label="等于0" value="no"></el-option>
+                    <el-option label="少量货" value="little"></el-option>
+                    <el-option label="无货" value="no"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item class="btn_bottom">
@@ -159,6 +159,12 @@ export default {
         },
         mounted() {
             this.getData()
+
+            // 加载仓库信息
+            axios.post('/v1/store/listStores', {}).then(resp => {
+                this.stores = resp.data.data
+            })
+
         },
         methods: {
             confirmModify() {
@@ -249,7 +255,7 @@ export default {
                 changeSearchByNumber() {
 
                     if (this.search_by_number == 'little') {
-                        this.min_number = 0
+                        this.min_number = 1
                         this.max_number = 6
                     } else if (this.search_by_number == 'no') {
                         this.min_number = 0
