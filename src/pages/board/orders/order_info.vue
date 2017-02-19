@@ -109,7 +109,10 @@
                     <label class="first-lable">成交时间：</label><label>{{present_order.pay_at}}</label>
                 </div>
                 <div class="info_info" v-if="present_order.order_status==2">
-                    <label class="first-lable">操作：</label><label><el-button type="info" size="small">发货</el-button></label>
+                    <label class="first-lable">操作：</label><label><el-button type="info" size="small"  @click="sendOrder(present_order.order_id)">发货</el-button></label>
+                </div>
+                <div class="info_info" v-if="present_order.order_status==3">
+                    <label class="first-lable">操作：</label><label><el-button type="danger" size="small"  @click="checkCompleteOrder(present_order.order_id)">关闭订单</el-button></label>
                 </div>
             </el-col>
         </el-row>
@@ -162,6 +165,20 @@ export default {
         }
     },
     methods: {
+        checkCompleteOrder(order_id) {
+          this.$confirm('您将关闭订单, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.completeOrder(order_id)
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消操作!'
+            });
+          });
+        },
         loadingOrder(order_id) {
             var self = this
             var order_id = order_id
@@ -189,6 +206,29 @@ export default {
                 present_order.pay_at = stamp2date(present_order.pay_at, 'YYYY-MM-DD HH:mm')
                 self.present_order = present_order
               }
+            })
+        },
+        sendOrder(order_id){
+            axios.post('/v1/orders/send_orders', {order_ids: [order_id]}).then(resp => {
+                if(resp.data.code == '00000') {
+                    //发货成功
+                    this.$message({
+                        message: '订单 '+ order_id +' 已发货',
+                        type: 'success'
+                    })
+                    this.loadingOrder(order_id)
+                }
+            })
+        },
+        completeOrder(order_id){
+            axios.post('/v1/orders/complete_orders', {order_ids: [order_id]}).then(resp =>{
+                if(resp.data.code == '00000'){
+                    this.$message({
+                        message: '订单' + order_id + '交易成功',
+                        type:'success'
+                    })
+                    this.loadingOrder(order_id)
+                }
             })
         }
     }
