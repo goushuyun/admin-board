@@ -159,11 +159,6 @@ export default {
         },
         mounted() {
             this.getData()
-
-            //获取货架信息
-            axios.post('/v1/store/listStores', {}).then(resp => {
-                this.stores = resp.data.data
-            })
         },
         methods: {
             confirmModify() {

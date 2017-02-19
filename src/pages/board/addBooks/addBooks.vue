@@ -70,29 +70,66 @@ div.right {
                 </el-select>
             </el-form-item>
             <el-form-item label="类型">
-                <el-radio-group v-model="ruleForm.type">
-                    <el-radio :label="1">新书</el-radio>
-                    <el-radio :label="2">二手书</el-radio>
-                </el-radio-group>
+                <el-row>
+                    <el-col :span="11">
+                        <div style="text-align:center;color:#3A8AFF">新书</div>
+                    </el-col>
+                    <el-col :span="11" :offset="2">
+                        <div style="text-align:center;color:#1AAD19">二手书</div>
+                    </el-col>
+                </el-row>
             </el-form-item>
-            <el-form-item label="售价" prop="selling_price">
-                <el-input type="number" v-model.trim.number="ruleForm.selling_price"></el-input>
+
+            <el-form-item label="折扣">
+                <el-row>
+                    <el-col :span="7">
+                        <el-input type="number" v-model.trim.number="ruleForm.new_book_discount">
+                            <template slot="append">折</template>
+                        </el-input>
+                    </el-col>
+                    <el-col :span="4">
+                        <div style="text-align:center;color:#3A8AFF">{{'¥' + new_book_price}}</div>
+                    </el-col>
+                    <el-col :span="7" :offset="2">
+                        <el-input type="number" v-model.trim.number="ruleForm.old_book_discount">
+                            <template slot="append">折</template>
+                        </el-input>
+                    </el-col>
+                    <el-col :span="4">
+                        <div style="text-align:center;color:#1AAD19">{{'¥' + old_book_price}}</div>
+                    </el-col>
+                </el-row>
             </el-form-item>
+
             <el-form-item label="货架位置">
-                <el-col :span="11">
-                    <el-select v-model="ruleForm.store_id" style="width: 100%;" placeholder="仓库位置" @change="chooseStore">
-                        <el-option v-for="store in stores" :label="store.name" :value="store.id"></el-option>
-                    </el-select>
-                </el-col>
-                <el-col class="line" :span="2">---</el-col>
-                <el-col :span="11">
-                    <el-select v-model="ruleForm.shelf_id" @change="chooseShelf" style="width: 100%;" placeholder="货架位置">
-                        <el-option v-for="shelf in shelves" :label="shelf.name" :value="shelf.id"></el-option>
-                    </el-select>
-                </el-col>
+                <el-row>
+                    <el-col :span="11">
+                        <el-select v-model="ruleForm.new_book_store_id" placeholder="仓库位置" @change="new_chooseStore">
+                            <el-option v-for="store in stores" :label="store.name" :value="store.id"></el-option>
+                        </el-select>
+                        <el-select v-model="ruleForm.new_book_shelf_id" @change="chooseShelf" placeholder="货架位置">
+                            <el-option v-for="shelf in new_shelves" :label="shelf.name" :value="shelf.id"></el-option>
+                        </el-select>
+                    </el-col>
+                    <el-col :span="11" :offset="2">
+                        <el-select v-model="ruleForm.old_book_store_id" placeholder="仓库位置" @change="old_chooseStore">
+                            <el-option v-for="store in stores" :label="store.name" :value="store.id"></el-option>
+                        </el-select>
+                        <el-select v-model="ruleForm.old_book_shelf_id" @change="chooseShelf" placeholder="货架位置">
+                            <el-option v-for="shelf in old_shelves" :label="shelf.name" :value="shelf.id"></el-option>
+                        </el-select>
+                    </el-col>
+                </el-row>
             </el-form-item>
             <el-form-item label="数量" class="setHeight">
-                <el-input-number v-model="ruleForm.amount" :min="1" style="width: 100%;"></el-input-number>
+                <el-row>
+                    <el-col :span="11">
+                        <el-input-number v-model="ruleForm.new_book_amount" :min="0" style="width: 100%;"></el-input-number>
+                    </el-col>
+                    <el-col :span="11" :offset="2">
+                        <el-input-number v-model="ruleForm.old_book_amount" :min="0" style="width: 100%;"></el-input-number>
+                    </el-col>
+                </el-row>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" :disabled="ruleForm.title == ''" @click="pullIOnSale('ruleForm')">上架销售</el-button>
@@ -125,19 +162,29 @@ export default {
                 price: 0,
 
                 //sellingBook
-                amount: 1,
                 type: 1,
                 category: '',
-                store_id: '',
-                shelf_id: '',
-                selling_price: 0
+
+                //新书
+                new_book_store_id: '',
+                new_book_shelf_id: '',
+                new_book_discount: 0,
+                new_book_amount: 0,
+
+                //二手书
+                old_book_store_id: '',
+                old_book_shelf_id: '',
+                old_book_discount: 0,
+                old_book_amount: 0
+
             },
 
             preBook: {},
 
             categories: [],
             stores: [],
-            shelves: [],
+            new_shelves: [],
+            old_shelves: [],
             token: '',
 
             rules: {
@@ -187,6 +234,15 @@ export default {
             }
         }
     },
+    computed: {
+        new_book_price() {
+                return (parseFloat(this.ruleForm.price) * (this.ruleForm.new_book_discount / 10)).toFixed(2)
+            },
+            old_book_price() {
+                return (parseFloat(this.ruleForm.price) * (this.ruleForm.old_book_discount / 10)).toFixed(2)
+            }
+    },
+
     mounted() {
         axios.post('/v1/store/listStores', {}).then(resp => {
             this.stores = resp.data.data
@@ -196,34 +252,68 @@ export default {
         console.log(this.categories)
     },
     methods: {
-        reset(formName){
-            this.$refs[formName].resetFields();
-        },
-        pullIOnSale(ruleForm) {
+        reset(formName) {
+                this.$refs[formName].resetFields();
+            },
+            pullIOnSale(ruleForm) {
                 //校验必填字段
                 this.$refs[ruleForm].validate((valid) => {
                     if (valid) {
-                        this.loading = true
+
+                        if (this.ruleForm.old_book_amount == 0 && this.ruleForm.new_book_amount == 0) {
+                            this.$message({
+                                message: '请填写图书数量',
+                                type: 'warning'
+                            })
+                            return
+                        }
+
+                        // this.loading = true
                         this.loading_text = '正在上架'
 
-                        //封装 sellingBook , 向后端传值
-                        let sellingBook = {}
-                        sellingBook.isbn = this.ruleForm.isbn
-                        sellingBook.category = this.ruleForm.category
-                        sellingBook.amount = this.ruleForm.amount
-                        sellingBook.type = this.ruleForm.type
-                        sellingBook.selling_price = parseInt(this.ruleForm.selling_price * 100)
-                        sellingBook.shelf_id = this.ruleForm.shelf_id
-                        sellingBook.store_id = this.ruleForm.store_id
+                        //封装 , 向后端传值
+                        let new_book = {
+                                type: 1,
+                                shelf_id: this.ruleForm.new_book_shelf_id,
+                                store_id: this.ruleForm.new_book_store_id,
+                                amount: this.ruleForm.new_book_amount,
+                                selling_price: parseInt(this.new_book_price * 100)
+                            },
+                            old_book = {
+                                type: 2,
+                                shelf_id: this.ruleForm.old_book_shelf_id,
+                                store_id: this.ruleForm.old_book_store_id,
+                                amount: this.ruleForm.old_book_amount,
+                                selling_price: parseInt(this.old_book_price * 100)
+                            }
+
+                        new_book.isbn = old_book.isbn = this.ruleForm.isbn
+                        new_book.category = old_book.category = this.ruleForm.category
+
+                        console.log(new_book)
+                        console.log(old_book)
 
                         //图书上架
-                        axios.post('/v1/books/pullOnSale', sellingBook).then(resp => {
-                            this.loading = false
-                            console.log(resp.data)
+                        if (new_book.amount > 0) {
+                            axios.post('/v1/books/pullOnSale', new_book).then(resp => {
+                                this.loading = false
+                                this.reset('ruleForm') //清空字段
+                                this.ruleForm.pic = '' //clear pic
+                            })
+                        }
 
-                            this.$message("上架成功！")
+                        if (old_book.amount > 0) {
 
-                        })
+                            axios.post('/v1/books/pullOnSale', old_book).then(resp => {
+                                this.loading = false
+                                this.reset('ruleForm') //清空字段
+                                this.ruleForm.pic = '' //clear pic
+                            })
+
+                        }
+
+
+
 
                         //封装 book
                         let book = {}
@@ -235,12 +325,11 @@ export default {
                         book.price_int = parseInt(this.ruleForm.price * 100)
 
                         //检查标准图书信息是否有变化
-
                         if (this.preBook.title != book.title || this.preBook.publisher != book.publisher || this.preBook.pic != book.pic || this.preBook.author != book.author || parseInt(this.preBook.price) != book.price_int) {
                             axios.post('/v1/books/updateBookInfo', book).then(resp => {
                                 // 上架成功
-                                this.reset('ruleForm')  //清空字段
-                                this.ruleForm.pic = ''      //clear pic
+                                this.reset('ruleForm') //清空字段
+                                this.ruleForm.pic = '' //clear pic
                                 console.log(resp.data)
                             })
                         }
@@ -258,13 +347,24 @@ export default {
             chooseShelf() {
 
             },
-            chooseStore() {
-                this.ruleForm.shelf_id = ''
-                let store_id = this.ruleForm.store_id
+            new_chooseStore() {
+                this.ruleForm.new_book_shelf_id = ''
+                let store_id = this.ruleForm.new_book_store_id
                     //update shelf array
                 this.stores.forEach((store, index) => {
                     if (store.id == store_id) {
-                        this.shelves = this.stores[index].shelves
+                        this.new_shelves = this.stores[index].shelves
+                        return
+                    }
+                })
+            },
+            old_chooseStore() {
+                this.ruleForm.old_book_shelf_id = ''
+                let store_id = this.ruleForm.old_book_store_id
+                    //update shelf array
+                this.stores.forEach((store, index) => {
+                    if (store.id == store_id) {
+                        this.old_shelves = this.stores[index].shelves
                         return
                     }
                 })
