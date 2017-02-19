@@ -28,11 +28,11 @@
         </rl-form>
 
         <el-table style="width: 100%" :data="goods" v-loading.body="loading">
-            <el-table-column label="ISBN" width="140" prop="isbn">
+            <el-table-column label="ISBN" min-width="140" prop="isbn">
             </el-table-column>
             <el-table-column label="书名" width="180" prop="book.title">
             </el-table-column>
-            <el-table-column label="出版社" prop="book.publisher">
+            <el-table-column label="出版社" min-width="100" prop="book.publisher">
             </el-table-column>
             <el-table-column label="售价" width="120" prop="book.price">
             </el-table-column>
@@ -49,7 +49,7 @@
             <el-table-column label="操作">
                 <template scope="scope">
                     <el-button-group>
-                          <el-button size="small" type="primary" icon="edit" @click="changeStatus(scope.$index)"></el-button>
+                          <el-button :disabled="scope.row.amount<=0" size="small" type="primary" icon="edit" @click="changeStatus(scope.$index)"></el-button>
                           <el-button size="small" type="danger" icon="delete" @click="delGoods(scope.$index)"></el-button>
                     </el-button-group>
                 </template>
@@ -102,6 +102,12 @@ export default {
     },
 
     methods: {
+        //检查该商品是否符合设置为未推荐状态的标准(所有书籍均为未推荐)
+        TopicIsRecommend(){
+            this.goods.some(el => {
+                return el.recommend == true
+            })
+        },
         submit(){
             //检查话题名称、书本数量
             if(this.title == ''){
@@ -122,6 +128,7 @@ export default {
                 return {goods_id: el.id, recommend: el.recommend}
             })
 
+            data.recommend = this.TopicIsRecommend()
 
             console.log(data)
 
@@ -141,6 +148,19 @@ export default {
                     this.$message('操作成功！')
                 }
             })
+
+            //检查是否需要更新话题状态
+            if(!this.TopicIsRecommend()&& this.topic_id != ''){
+                //更新话题状态
+                axios.post('/v1/activity/update_topic_status', {id: this.topic_id}).then(resp=>{
+
+                    if(resp.data.code == '00000'){
+                        //do nothing
+                    }
+
+                })
+
+            }
         },
 
         changeStatus(index){
@@ -165,7 +185,7 @@ export default {
                 let topic_goods = {
                     recommend: false,
                     goods_id: this.goods[index].id,
-                    topic_id: 'delete',
+                    topic_id: this.topic_id,
                     operate_type: 'reduce'
                 }
 
@@ -176,7 +196,7 @@ export default {
         },
 
         search(){
-            //校验isbn
+            //isbn为空
             if(this.isbn == ''){
                 this.$message({
                     message: '请填写ISBN',
@@ -186,6 +206,7 @@ export default {
                 return
             }
 
+            //isbn不符合规定
             if(!/^\d{10,13}$/.test(this.isbn)){
                 this.$message({
                     message: '没有在仓库找到这本书',
