@@ -49,7 +49,7 @@ div.right {
         <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="80px">
             <el-form-item label="ISBN" class="setHeight" prop="isbn">
                 <el-input class="isbn_input" v-model.trim="ruleForm.isbn" :autofocus="true" v-on:keyup.enter.native="search">
-                    <el-button @click.enter="search" slot="append" icon="search"></el-button>
+                    <el-button @click="search" slot="append" icon="search"></el-button>
                 </el-input>
             </el-form-item>
             <el-form-item label="书名" prop="title">
@@ -143,6 +143,7 @@ div.right {
 
 <script>
 
+import {isISBNFormat} from "../../../scripts/utils"
 import axios from "../../../scripts/http"
 import uploadImage from "../../../scripts/uploadImage"
 import enumVals from "../../../scripts/enum"
@@ -249,29 +250,20 @@ export default {
         })
 
         this.categories = enumVals.categories
-        console.log(this.categories)
     },
     methods: {
         check_discount(discount, type) {
                 let dis = discount
                 if(dis<0){
-
-                    console.log('little')
-
                     dis = 0
                 }else if(dis>10){
-
-                    console.log('much');
                     dis = 10
                 }
 
                 if(dis != discount){
                     if(type == 'new'){
-                        console.log('(new)')
-
                         this.ruleForm.new_book_discount = dis
                     }else if (type == 'old') {
-                        console.log('(old)');
                         this.ruleForm.old_book_discount = dis
                     }
                 }
@@ -281,6 +273,8 @@ export default {
                 this.$refs[formName].resetFields();
             },
             pullIOnSale(ruleForm) {
+
+
                 //校验必填字段
                 this.$refs[ruleForm].validate((valid) => {
                     if (valid) {
@@ -342,9 +336,6 @@ export default {
                             })
                         }
 
-
-
-
                         //封装 book
                         let book = {}
                         book.title = this.ruleForm.title
@@ -400,6 +391,14 @@ export default {
                 })
             },
             search() {
+                if(!isISBNFormat(this.ruleForm.isbn)){
+                    this.$message({
+                        message: 'ISBN 码格式不正确！',
+                        type: 'warning'
+                    })
+                    return
+                }
+
                 this.loading_text = '正在搜索'
                 this.loading = true
                 axios.post('/v1/books/getBookInfo', {

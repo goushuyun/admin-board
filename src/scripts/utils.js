@@ -21,5 +21,15 @@ function stamp2date(dt, fmt) {
     }
 }
 
+function isISBNFormat (isbn){
+    if(isbn.length === 13){
+        //判断是否以 ‘978开头’
+        return isbn.indexOf('978') > 0
+    }
 
-export {testMobile, testPassword, getTimeVal, stamp2date}
+
+    return /^\d{10}$/.test(isbn)
+}
+
+
+export {testMobile, testPassword, getTimeVal, stamp2date, isISBNFormat}
