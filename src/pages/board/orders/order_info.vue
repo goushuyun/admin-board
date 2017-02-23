@@ -112,7 +112,7 @@
                     <label class="first-lable">下单时间：</label><label>{{present_order.order_at}}</label>
                 </div>
                 <div class="info_info">
-                    <label class="first-lable">成交时间：</label><label>{{present_order.pay_at}}</label>
+                    <label class="first-lable">付款时间：</label><label>{{present_order.pay_at}}</label>
                 </div>
                 <div class="info_info" v-if="present_order.order_status==2">
                     <label class="first-lable">操作：</label><label><el-button type="info" size="small"  @click="sendOrder(present_order.order_id)">发货</el-button></label>

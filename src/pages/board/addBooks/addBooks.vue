@@ -48,8 +48,8 @@ div.right {
     <div class="right">
         <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="80px">
             <el-form-item label="ISBN" class="setHeight" prop="isbn">
-                <el-input v-model.trim="ruleForm.isbn" :autofocus="true">
-                    <el-button @click="search" slot="append" icon="search"></el-button>
+                <el-input class="isbn_input" v-model.trim="ruleForm.isbn" :autofocus="true" v-on:keyup.enter.native="search">
+                    <el-button @click.enter="search" slot="append" icon="search"></el-button>
                 </el-input>
             </el-form-item>
             <el-form-item label="书名" prop="title">
@@ -83,7 +83,7 @@ div.right {
             <el-form-item label="折扣">
                 <el-row>
                     <el-col :span="7">
-                        <el-input type="number" v-model.trim.number="ruleForm.new_book_discount">
+                        <el-input @blur="check_discount(ruleForm.new_book_discount, 'new')" v-model="ruleForm.new_book_discount">
                             <template slot="append">折</template>
                         </el-input>
                     </el-col>
@@ -91,7 +91,7 @@ div.right {
                         <div style="text-align:center;color:#3A8AFF">{{'¥' + new_book_price}}</div>
                     </el-col>
                     <el-col :span="7" :offset="2">
-                        <el-input type="number" v-model.trim.number="ruleForm.old_book_discount">
+                        <el-input @blur="check_discount(ruleForm.old_book_discount, 'old')" v-model="ruleForm.old_book_discount">
                             <template slot="append">折</template>
                         </el-input>
                     </el-col>
@@ -252,7 +252,32 @@ export default {
         console.log(this.categories)
     },
     methods: {
-        reset(formName) {
+        check_discount(discount, type) {
+                let dis = discount
+                if(dis<0){
+
+                    console.log('little')
+
+                    dis = 0
+                }else if(dis>10){
+
+                    console.log('much');
+                    dis = 10
+                }
+
+                if(dis != discount){
+                    if(type == 'new'){
+                        console.log('(new)')
+
+                        this.ruleForm.new_book_discount = dis
+                    }else if (type == 'old') {
+                        console.log('(old)');
+                        this.ruleForm.old_book_discount = dis
+                    }
+                }
+
+            },
+            reset(formName) {
                 this.$refs[formName].resetFields();
             },
             pullIOnSale(ruleForm) {
@@ -303,13 +328,18 @@ export default {
                         }
 
                         if (old_book.amount > 0) {
-
                             axios.post('/v1/books/pullOnSale', old_book).then(resp => {
                                 this.loading = false
                                 this.reset('ruleForm') //清空字段
                                 this.ruleForm.pic = '' //clear pic
-                            })
 
+                                //提示成功
+                                this.$message('上传成功！')
+                                this.$nextTick(()=>{
+                                    $('.isbn_input input').focus()
+                                })
+
+                            })
                         }
 
 
