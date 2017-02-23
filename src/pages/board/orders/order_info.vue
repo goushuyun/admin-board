@@ -76,7 +76,7 @@
                 </el-steps>
             </el-col>
             <el-col :span="24" v-if="present_order.order_status==5">
-                <el-steps :space="200" :active="2" finish-status="process" center align-center>
+                <el-steps :space="300" :active="2" finish-status="process" center align-center>
                     <el-step title="买家下单" :description="present_order.order_at"></el-step>
                     <el-step title="已关闭" :description="present_order.close_at==0?'':present_order.close_at"></el-step>
                 </el-steps>
