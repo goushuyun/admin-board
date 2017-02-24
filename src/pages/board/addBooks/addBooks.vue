@@ -30,7 +30,23 @@ div.right {
         text-align: center;
     }
 }
-
+.zindexarea {
+  position: relative;
+}
+.zindex0{
+  position: absolute;
+  top: 15px;
+  width: 240px;
+  height: 230px;
+  color: #FFFFFF;
+  z-index: -1;
+  border-right: 2px dashed #bfcbd9;
+}
+.zindex1{
+  position: absolute;
+  width: 400px;
+  z-index: 1;
+}
 </style>
 
 <template lang="html">
@@ -69,72 +85,78 @@ div.right {
                     <el-option v-for="category in categories" :label="category.name" :value="category.val"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="类型">
-                <el-row>
-                    <el-col :span="11">
-                        <div style="text-align:center;color:#3A8AFF">新书</div>
-                    </el-col>
-                    <el-col :span="11" :offset="2">
-                        <div style="text-align:center;color:#1AAD19">二手书</div>
-                    </el-col>
-                </el-row>
-            </el-form-item>
+            <div class="zindexarea">
+                <div class="zindex0">(我不能删除，嘻嘻)
+                </div>
+                <div class="zindex1">
+                  <el-form-item label="类型">
+                      <el-row>
+                          <el-col :span="11">
+                              <div style="text-align:center;color:#1AAD19">二手书</div>
+                          </el-col>
+                          <el-col :span="11" :offset="2">
+                              <div style="text-align:center;color:#3A8AFF">新书</div>
+                          </el-col>
+                      </el-row>
+                  </el-form-item>
 
-            <el-form-item label="折扣">
-                <el-row>
-                    <el-col :span="7">
-                        <el-input @blur="check_discount(ruleForm.new_book_discount, 'new')" v-model="ruleForm.new_book_discount">
-                            <template slot="append">折</template>
-                        </el-input>
-                    </el-col>
-                    <el-col :span="4">
-                        <div style="text-align:center;color:#3A8AFF">{{'¥' + new_book_price}}</div>
-                    </el-col>
-                    <el-col :span="7" :offset="2">
-                        <el-input @blur="check_discount(ruleForm.old_book_discount, 'old')" v-model="ruleForm.old_book_discount">
-                            <template slot="append">折</template>
-                        </el-input>
-                    </el-col>
-                    <el-col :span="4">
-                        <div style="text-align:center;color:#1AAD19">{{'¥' + old_book_price}}</div>
-                    </el-col>
-                </el-row>
-            </el-form-item>
+                  <el-form-item label="折扣">
+                      <el-row>
+                          <el-col :span="7">
+                              <el-input @blur="check_discount(ruleForm.old_book_discount, 'old')" v-model="ruleForm.old_book_discount">
+                                  <template slot="append">折</template>
+                              </el-input>
+                          </el-col>
+                          <el-col :span="4">
+                              <div style="text-align:center;color:#1AAD19">{{'¥' + old_book_price}}</div>
+                          </el-col>
+                          <el-col :span="7" :offset="2">
+                              <el-input @blur="check_discount(ruleForm.new_book_discount, 'new')" v-model="ruleForm.new_book_discount">
+                                  <template slot="append">折</template>
+                              </el-input>
+                          </el-col>
+                          <el-col :span="4">
+                              <div style="text-align:center;color:#3A8AFF">{{'¥' + new_book_price}}</div>
+                          </el-col>
+                      </el-row>
+                  </el-form-item>
 
-            <el-form-item label="货架位置">
-                <el-row>
-                    <el-col :span="11">
-                        <el-select v-model="ruleForm.new_book_store_id" placeholder="仓库位置" @change="new_chooseStore">
-                            <el-option v-for="store in stores" :label="store.name" :value="store.id"></el-option>
-                        </el-select>
-                        <el-select v-model="ruleForm.new_book_shelf_id" @change="chooseShelf" placeholder="货架位置">
-                            <el-option v-for="shelf in new_shelves" :label="shelf.name" :value="shelf.id"></el-option>
-                        </el-select>
-                    </el-col>
-                    <el-col :span="11" :offset="2">
-                        <el-select v-model="ruleForm.old_book_store_id" placeholder="仓库位置" @change="old_chooseStore">
-                            <el-option v-for="store in stores" :label="store.name" :value="store.id"></el-option>
-                        </el-select>
-                        <el-select v-model="ruleForm.old_book_shelf_id" @change="chooseShelf" placeholder="货架位置">
-                            <el-option v-for="shelf in old_shelves" :label="shelf.name" :value="shelf.id"></el-option>
-                        </el-select>
-                    </el-col>
-                </el-row>
-            </el-form-item>
-            <el-form-item label="数量" class="setHeight">
-                <el-row>
-                    <el-col :span="11">
-                        <el-input-number v-model="ruleForm.new_book_amount" :min="0" style="width: 100%;"></el-input-number>
-                    </el-col>
-                    <el-col :span="11" :offset="2">
-                        <el-input-number v-model="ruleForm.old_book_amount" :min="0" style="width: 100%;"></el-input-number>
-                    </el-col>
-                </el-row>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" :disabled="ruleForm.title == ''" @click="pullIOnSale('ruleForm')">上架销售</el-button>
-                <el-button @click="reset('ruleForm')">重置</el-button>
-            </el-form-item>
+                  <el-form-item label="货架位置">
+                      <el-row>
+                          <el-col :span="11">
+                              <el-select v-model="ruleForm.old_book_store_id" placeholder="仓库位置" @change="old_chooseStore">
+                                  <el-option v-for="store in stores" :label="store.name" :value="store.id"></el-option>
+                              </el-select>
+                              <el-select v-model="ruleForm.old_book_shelf_id" @change="chooseShelf" placeholder="货架位置">
+                                  <el-option v-for="shelf in old_shelves" :label="shelf.name" :value="shelf.id"></el-option>
+                              </el-select>
+                          </el-col>
+                          <el-col :span="11" :offset="2">
+                              <el-select v-model="ruleForm.new_book_store_id" placeholder="仓库位置" @change="new_chooseStore">
+                                  <el-option v-for="store in stores" :label="store.name" :value="store.id"></el-option>
+                              </el-select>
+                              <el-select v-model="ruleForm.new_book_shelf_id" @change="chooseShelf" placeholder="货架位置">
+                                  <el-option v-for="shelf in new_shelves" :label="shelf.name" :value="shelf.id"></el-option>
+                              </el-select>
+                          </el-col>
+                      </el-row>
+                  </el-form-item>
+                  <el-form-item label="数量" class="setHeight">
+                      <el-row>
+                          <el-col :span="11">
+                              <el-input-number v-model="ruleForm.old_book_amount" :min="0" style="width: 100%;"></el-input-number>
+                          </el-col>
+                          <el-col :span="11" :offset="2">
+                              <el-input-number v-model="ruleForm.new_book_amount" :min="0" style="width: 100%;"></el-input-number>
+                          </el-col>
+                      </el-row>
+                  </el-form-item>
+                  <el-form-item>
+                      <el-button type="primary" :disabled="ruleForm.title == ''" @click="pullIOnSale('ruleForm')">上架销售</el-button>
+                      <el-button @click="reset('ruleForm')">重置</el-button>
+                  </el-form-item>
+                </div>
+            </div>
         </el-form>
     </div>
 </div>
