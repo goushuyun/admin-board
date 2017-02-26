@@ -86,8 +86,7 @@ div.right {
                 </el-select>
             </el-form-item>
             <div class="zindexarea">
-                <div class="zindex0">(我不能删除，嘻嘻)
-                </div>
+                <div class="zindex0">.</div>
                 <div class="zindex1">
                   <el-form-item label="类型">
                       <el-row>
