@@ -152,6 +152,7 @@
       <div class="tatal_items"><label class="first-lable">运费：</label><label class="first-lable">¥{{present_order.freight}}</label></div>
       <div class="tatal_items"><label class="first-lable tatal_item">订单总价：</label><label class="first-lable tatal_price">¥{{present_order.total_price}}</label></div>
     </div>
+  </div>
 </template>
 
 <script>

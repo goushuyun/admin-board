@@ -25,7 +25,7 @@
         <el-form-item class="btn_bottom">
             <el-button size="small" @click="submit">提交发布</el-button>
         </el-form-item>
-        </rl-form>
+      </el-form>
 
         <el-table style="width: 100%" :data="goods" v-loading.body="loading">
             <el-table-column label="ISBN" min-width="140" prop="isbn">
@@ -41,8 +41,8 @@
             <el-table-column label="状态" width="100">
 
                 <template scope="scope">
-                    <p style="color: #13CE66;" v-if="scope.row.recommend == true" class="promotion">推荐中<p>
-                    <p style="color: #FF4949;" v-if="scope.row.recommend == false" class="promotion">未推荐<p>
+                    <p style="color: #13CE66;" v-if="scope.row.recommend == true" class="promotion">推荐中</p>
+                    <p style="color: #FF4949;" v-if="scope.row.recommend == false" class="promotion">未推荐</p>
                 </template>
 
             </el-table-column>
