@@ -2,7 +2,11 @@
 import Axios from 'axios'
 import Vue from 'vue'
 const axios = Axios.create({
+<<<<<<< HEAD
     // baseURL: 'http://admin.cumpusbox.com/',   //购书云
+=======
+    baseURL: 'http://admin.cumpusbox.com/',   //购书云
+>>>>>>> b96f7335c2b3467574f7e62bf9450f5862868dd6
     headers: {
         'Content-Type': 'application/json'
     }

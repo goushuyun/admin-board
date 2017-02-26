@@ -85,6 +85,12 @@
                 </template>
                 <el-menu-item index="/admin/topic">话题查看</el-menu-item>
             </el-submenu>
+            <el-submenu index="5">
+                <template slot="title">
+                    <i class="el-icon-menu"></i>线下零售
+                </template>
+                <el-menu-item index="/admin/offline_retail">线下零售</el-menu-item>
+            </el-submenu>
         </el-menu>
     </div>
 
