@@ -38,5 +38,9 @@ export default [{
         name: 'order_info',
         path: 'order_info',
         component: require('../pages/board/orders/order_info')
+    },{
+        name: 'offline_retail',
+        path: 'offline_retail',
+        component: require('../pages/board/offline/retail')
     }]
 }]
