@@ -47,6 +47,37 @@ div.right {
   width: 400px;
   z-index: 1;
 }
+
+.pro_info {
+  width: 182px;
+  margin-top: 35px;
+  text-align: center;
+  border: 1px solid #bfcbd9;
+  font-size: 14px;
+  .title{
+    padding: 20px 0;
+    background: #EEF1F6;
+  }
+  .row{
+    display: flex;
+    align-items: center;
+    height: 60px;
+    line-height: 20px;
+  }
+  .double{
+    height: 90px;
+  }
+  .column{
+    width: 91px;
+    padding: 0 5px;
+  }
+  .border-bottom {
+    border-bottom: 1px solid #bfcbd9;
+  }
+  .border-right {
+    border-right: 1px dashed #bfcbd9;
+  }
+}
 </style>
 
 <template lang="html">
@@ -60,6 +91,25 @@ div.right {
             <img class="book_img" :src="ruleForm.pic" alt="" />
             <el-button id="change_image_btn" class="changePic" @click="changePic" :disabled="ruleForm.isbn == ''">更换图片</el-button>
         </form>
+        <div class="pro_info">
+          <div class="title border-bottom">原有库存信息</div>
+          <div class="row border-bottom">
+            <div class="column border-right" style="color:#1AAD19">二手书</div>
+            <div class="column" style="color:#3A8AFF">新书</div>
+          </div>
+          <div class="row border-bottom">
+            <div class="column border-right"><div>{{old_book.discount?old_book.discount:'无'}}</div><div style="color:red">{{old_book.selling_price?'￥' + old_book.selling_price:''}}</div></div>
+            <div class="column"><div>{{new_book.discount?new_book.discount:'无'}}</div><div style="color:red">{{new_book.selling_price?'￥' + new_book.selling_price:''}}</div></div>
+          </div>
+          <div class="double row border-bottom">
+            <div class="column border-right"><div>{{old_book.store_shelf?old_book.store_shelf:'无'}}</div></div>
+            <div class="column"><div>{{new_book.store_shelf?new_book.store_shelf:'无'}}</div></div>
+          </div>
+          <div class="row">
+            <div class="column border-right">{{old_book.amount?old_book.amount:'0'}}</div>
+            <div class="column">{{new_book.amount?new_book.amount:'0'}}</div>
+          </div>
+        </div>
     </div>
     <div class="right">
         <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="80px">
@@ -253,7 +303,9 @@ export default {
                     message: '请填写出售价格',
                     trigger: 'blur'
                 }]
-            }
+            },
+            new_book:{},
+            old_book:{}
         }
     },
     computed: {
@@ -464,6 +516,33 @@ export default {
                     this.ruleForm.author = book.author
 
                     this.loading = false
+                })
+
+                this.new_book = {}
+                this.old_book = {}
+                axios.post('/v1/books/checkStore', {
+                    isbn: this.ruleForm.isbn
+                }).then(resp => {
+                    console.log(resp);
+                    if (resp.data.code != '00000' || resp.data.data.length <= 0) {
+                        return
+                    }
+                    var resp_books = resp.data.data
+                    for (var i = 0; i < resp_books.length; i++) {
+                        var resp_book = resp_books[i]
+                        var book = {
+                            type: resp_book.type,
+                            discount: parseFloat(resp_book.selling_price / resp_book.book.price_int * 10).toFixed(1) + ' 折',
+                            selling_price: parseFloat(resp_book.selling_price / 100).toFixed(2),
+                            amount: resp_book.amount,
+                            store_shelf: resp_book.store.name + "-" + resp_book.shelf.name
+                        }
+                        if (resp_book.type == 1) {
+                            this.new_book = book
+                        } else {
+                            this.old_book = book
+                        }
+                    }
                 })
             },
             changePic() {
