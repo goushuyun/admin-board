@@ -34,7 +34,7 @@ div#loginBox{
         <div id="loginBox">
             <img class="logo" src="../../images/logo.jpg" alt="">
             <el-input v-model="tel" placeholder="手机号码" autofocus></el-input>
-            <el-input v-model="password" placeholder="密码"></el-input>
+            <el-input v-model="password" type="password" placeholder="密码"></el-input>
             <el-button class="login_btn" :loading="btn_loading" type="primary" @click="login">登录</el-button>
         </div>
     </div>
@@ -47,8 +47,8 @@ import axios from "../../scripts/http"
 export default {
     data(){
         return {
-            tel: '18817953402',
-            password: '052zhuan055',
+            tel: '',
+            password: '',
             btn_loading: false
         }
     },

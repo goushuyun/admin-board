@@ -2,7 +2,7 @@
 import Axios from 'axios'
 import Vue from 'vue'
 const axios = Axios.create({
-    // baseURL: 'http://admin.cumpusbox.com/',
+    baseURL: 'http://admin.cumpusbox.com/',   //购书云
     headers: {
         'Content-Type': 'application/json'
     }
@@ -28,7 +28,7 @@ axios.interceptors.response.use(function(response) {
     }
     //relogin
     if(response.data.code == '11014'){
-        window.location.href = "http://localhost:8086/#/"
+        window.location.href = "http://admin.boxcumpus.com/#"
     }
     //handler error
     if(response.data.code != '00000'){

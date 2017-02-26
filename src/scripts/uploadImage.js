@@ -15,7 +15,7 @@ export default {
 
             iframe.onload = (e) => {
                 //加载完成之后，前端切换显示上传的图片
-                this.form.logo = "http://ojrjlwt2h.bkt.clouddn.com//shop/" + this.shop_id + "?" + getTimeVal()
+                this.form.logo = "http://ojrjlwt2h.bkt.clouddn.com/shop/" + this.shop_id + "?" + getTimeVal()      //购书云
                 iframe.parentNode.removeChild(iframe);
                 iframe = null;
             }
@@ -37,7 +37,7 @@ export default {
 
             iframe.onload = (e) => {
                 //加载完成之后，前端切换显示上传的图片
-                this.ruleForm.pic = "http://ojrjlwt2h.bkt.clouddn.com/" + this.ruleForm.isbn + "?" + getTimeVal()
+                this.ruleForm.pic = "http://ojrjlwt2h.bkt.clouddn.com/" + this.ruleForm.isbn + "?" + getTimeVal()   //购书云
                 iframe.parentNode.removeChild(iframe);
                 iframe = null;
             }
