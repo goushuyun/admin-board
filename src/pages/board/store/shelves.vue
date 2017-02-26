@@ -103,7 +103,7 @@ div.content {
     <div class="statistics">
         <div class="result">
             共<span class="number">{{stores.length}}</span>个仓库
-            共<span class="number">28989</span>本书
+            共<span class="number">{{total_amount}}</span>本书
         </div>
         <el-button @click="addStore" type="success" size="small" icon="plus">添加仓库</el-button>
     </div>
@@ -118,11 +118,22 @@ export default {
         axios.post('/v1/store/listStores', {}).then((resp)=>{
             this.stores = resp.data.data
         })
+
+
+        //获取库存总数
+        axios.post('/v1/books/get_goods_sum_amount', {}).then(res=>{
+            if(res.data.code == '00000'){
+                this.total_amount = res.data.amount
+            }
+            console.log(res);
+        })
+
     },
     data(){
         return{
             stores: [],
-            show_ele_id: ''
+            show_ele_id: '',
+            total_amount: 0
         }
     },
     methods:{

@@ -103,7 +103,7 @@ div.right {
                   <el-form-item label="折扣">
                       <el-row>
                           <el-col :span="7">
-                              <el-input @blur="check_discount(ruleForm.old_book_discount, 'old')" v-model="ruleForm.old_book_discount">
+                              <el-input @focus="clear_input('old')" @blur="check_discount(ruleForm.old_book_discount, 'old')" v-model="ruleForm.old_book_discount">
                                   <template slot="append">折</template>
                               </el-input>
                           </el-col>
@@ -111,7 +111,7 @@ div.right {
                               <div style="text-align:center;color:#1AAD19">{{'¥' + old_book_price}}</div>
                           </el-col>
                           <el-col :span="7" :offset="2">
-                              <el-input @blur="check_discount(ruleForm.new_book_discount, 'new')" v-model="ruleForm.new_book_discount">
+                              <el-input @focus="clear_input('new')" @blur="check_discount(ruleForm.new_book_discount, 'new')" v-model="ruleForm.new_book_discount">
                                   <template slot="append">折</template>
                               </el-input>
                           </el-col>
@@ -259,11 +259,11 @@ export default {
     },
     computed: {
         new_book_price() {
-                return (parseFloat(this.ruleForm.price) * (this.ruleForm.new_book_discount / 10)).toFixed(2)
-            },
-            old_book_price() {
-                return (parseFloat(this.ruleForm.price) * (this.ruleForm.old_book_discount / 10)).toFixed(2)
-            }
+            return (parseFloat(this.ruleForm.price) * (this.ruleForm.new_book_discount / 10)).toFixed(2)
+        },
+        old_book_price() {
+            return (parseFloat(this.ruleForm.price) * (this.ruleForm.old_book_discount / 10)).toFixed(2)
+        }
     },
 
     mounted() {
@@ -274,7 +274,25 @@ export default {
         this.categories = enumVals.categories
     },
     methods: {
+        clear_input(type){
+            if(type=='new'){
+                this.ruleForm.new_book_discount = ''
+            }
+            if(type=='old'){
+                this.ruleForm.old_book_discount = ''
+            }
+        },
         check_discount(discount, type) {
+                if(discount == ''){
+                    if(type == 'new'){
+                        this.ruleForm.new_book_discount = 0
+                    }else if (type == 'old') {
+                        this.ruleForm.old_book_discount = 0
+                    }
+
+                    return
+                }
+
                 let dis = discount
                 if(dis<0){
                     dis = 0
@@ -352,6 +370,8 @@ export default {
                                 //提示成功
                                 this.$message('上传成功！')
                                 this.$nextTick(()=>{
+                                    //保留上一次的类别
+                                    this.ruleForm.category = new_book.category
                                     $('.isbn_input input').focus()
                                 })
 

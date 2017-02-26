@@ -34,7 +34,7 @@ div#loginBox{
         <div id="loginBox">
             <img class="logo" src="../../images/logo.jpg" alt="">
             <el-input v-model="tel" placeholder="手机号码" autofocus></el-input>
-            <el-input v-model="password" type="password" placeholder="密码"></el-input>
+            <el-input @keyup.enter.native="login" v-model="password" type="password" placeholder="密码"></el-input>
             <el-button class="login_btn" :loading="btn_loading" type="primary" @click="login">登录</el-button>
         </div>
     </div>
