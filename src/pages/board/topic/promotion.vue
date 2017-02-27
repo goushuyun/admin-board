@@ -17,45 +17,33 @@
 
     <el-form label-width="80px" :inline="true">
         <el-form-item label="添加书籍">
-            <el-input v-model="isbn" size="small" placeholder="请输入isbn编码" :autofocus="true" :maxlength="13"></el-input>
+            <el-input v-model="isbn" @keyup.enter.native="search" size="small" placeholder="请输入isbn编码" :autofocus="true" :maxlength="13" icon="search" :on-icon-click="search"></el-input>
         </el-form-item>
         <el-form-item class="btn_bottom">
-            <el-button size="small" type="primary" @click="search">查找</el-button>
+            <el-button type="primary" size="small" @click="submit">提交发布</el-button>
         </el-form-item>
-        <el-form-item class="btn_bottom">
-            <el-button size="small" @click="submit">提交发布</el-button>
-        </el-form-item>
-        </rl-form>
+    </el-form>
 
-        <el-table style="width: 100%" :data="goods" v-loading.body="loading">
-            <el-table-column label="ISBN" min-width="140" prop="isbn">
-            </el-table-column>
-            <el-table-column label="书名" width="180" prop="book.title">
-            </el-table-column>
-            <el-table-column label="出版社" min-width="100" prop="book.publisher">
-            </el-table-column>
-            <el-table-column label="售价" width="120" prop="book.price">
-            </el-table-column>
-            <el-table-column label="库存量" width="80" prop="amount">
-            </el-table-column>
-            <el-table-column label="状态" width="100">
+    <el-table style="width: 100%" :data="goods" v-loading.body="loading">
+        <el-table-column label="ISBN" min-width="140" prop="isbn">
+        </el-table-column>
+        <el-table-column label="书名" width="180" prop="book.title">
+        </el-table-column>
+        <el-table-column label="出版社" min-width="100" prop="book.publisher">
+        </el-table-column>
+        <el-table-column label="售价" width="120" prop="book.price">
+        </el-table-column>
+        <el-table-column label="库存量" width="80" prop="amount">
+        </el-table-column>
+        <el-table-column label="操作">
+            <template scope="scope">
+                <el-button-group>
+                      <el-button size="small" type="text" icon="delete" @click="delGoods(scope.$index)"></el-button>
+                </el-button-group>
+            </template>
 
-                <template scope="scope">
-                    <p style="color: #13CE66;" v-if="scope.row.recommend == true" class="promotion">推荐中<p>
-                    <p style="color: #FF4949;" v-if="scope.row.recommend == false" class="promotion">未推荐<p>
-                </template>
-
-            </el-table-column>
-            <el-table-column label="操作">
-                <template scope="scope">
-                    <el-button-group>
-                          <el-button :disabled="scope.row.amount<=0" size="small" type="primary" icon="edit" @click="changeStatus(scope.$index)"></el-button>
-                          <el-button size="small" type="danger" icon="delete" @click="delGoods(scope.$index)"></el-button>
-                    </el-button-group>
-                </template>
-
-            </el-table-column>
-        </el-table>
+        </el-table-column>
+    </el-table>
 
 </div>
 
@@ -63,11 +51,11 @@
 
 <script>
 import axios from "../../../scripts/http"
-
+import {isISBNFormat} from "../../../scripts/utils"
 export default {
     created(){
         //拿到话题的ID，推荐状态
-        let topic_id = this.$route.params.topic_id
+        let topic_id = this.$route.params.topic_id, title = this.$route.params.title
         let recommend = this.$route.params.recommend
 
         console.log(topic_id + '-----' + recommend)
@@ -81,15 +69,15 @@ export default {
 
         }else{
             this.topic_id = topic_id
+            this.title = title
             this.recommend = recommend
             //编辑话题，获取该话题的说有商品数据
             console.log('the topic_id is ' + topic_id)
             let data = {
                 page: 1,
-                size:  10,
+                size:  15,
                 topic_id
             }
-
 
             axios.post('/v1/books/checkStore', data).then(resp => {
                 if(resp.data.code = '00000'){
@@ -100,8 +88,6 @@ export default {
                 }
             })
 
-
-
         }
 
         console.log(topic_id)
@@ -111,7 +97,7 @@ export default {
         //检查该商品是否符合设置为未推荐状态的标准(所有书籍均为未推荐)
         TopicIsRecommend(){
             return this.goods.some(el => {
-                return el.recommend == true
+                return el.amount > 0
             })
         },
         submit(){
@@ -126,25 +112,42 @@ export default {
                 return
             }
 
-            //组织数据开始提交
-            let data = {title: this.title}
-            data.topic_items = this.goods.map(el => {
-                console.log(el)
+            /*
+                提交发布分两种，
+                1 => 没有topic_id, 新发布话题
+                2 => 有topic_id, 更新话题
+            */
 
-                return {goods_id: el.id, recommend: el.recommend}
-            })
+            if(this.topic_id != ''){
+                //更新话题，删除&添加已作处理，其实就是跟新一个话题名称
+                let data = {title: this.title, id: this.topic_id}
+                axios.post('/v1/activity/update_topic_title', data).then(res=>{
+                    if(res.data.code == '00000'){
+                        //修改title 成功
+                        this.$router.push('topic')
+                    }
+                })
+            }else{
+                //没有topic_id , 组织数据开始提交
+                let data = {title: this.title}
+                data.topic_items = this.goods.map(el => {
+                    console.log(el)
 
-            data.recommend = this.TopicIsRecommend()
+                    return {goods_id: el.id}
+                })
 
-            console.log(data)
+                data.recommend = this.TopicIsRecommend()
 
-            axios.post('/v1/activity/add_topic', data).then(resp=>{
-                //发布成功后，跳转到专题列表页面
-                if(resp.data.code == '00000'){
-                    this.$router.push('topic')
-                }
-            })
+                console.log(data)
 
+                axios.post('/v1/activity/add_topic', data).then(resp=>{
+                    //发布成功后，跳转到专题列表页面
+                    if(resp.data.code == '00000'){
+                        this.$router.push('topic')
+                    }
+                })
+
+            }
         },
 
         updateTopicGoods(goods){
@@ -154,19 +157,6 @@ export default {
                     this.$message('操作成功！')
                 }
             })
-
-            //检查是否需要更新话题状态
-            if(!this.TopicIsRecommend() && this.recommend == true){
-                //更新话题状态
-                axios.post('/v1/activity/update_topic_status', {id: this.topic_id}).then(resp=>{
-
-                    if(resp.data.code == '00000'){
-                        //do nothing
-                    }
-
-                })
-            }
-
         },
 
         changeStatus(index){
@@ -202,26 +192,27 @@ export default {
         },
 
         search(){
+            //一个话题内商品数量限制在15本内
+            if(this.goods.length > 15) {
+                this.$message({
+                    message: '一个话题内的书本数量不能超过 15 本',
+                    type: 'warning'
+                })
+
+                return
+            }
+
+
             //isbn为空
-            if(this.isbn == ''){
+            if(!isISBNFormat(this.isbn)){
                 this.$message({
-                    message: '请填写ISBN',
+                    message: '请填写正确的 ISBN 码',
                     type: 'warning'
                 })
 
                 return
             }
 
-            //isbn不符合规定
-            if(!/^\d{10,13}$/.test(this.isbn)){
-                this.$message({
-                    message: '没有在仓库找到这本书',
-                    type: 'warning'
-                })
-
-                this.isbn = ''
-                return
-            }
             this.loading = true
             let data = {
                 page: 1,
@@ -241,25 +232,26 @@ export default {
                         return
                     }
 
-
                     let goods = resp.data.data[0]
+
+                    //检查商品库存数量，小于0 则提示不能推荐
+                    if(goods.amount < 1){
+                        this.$message({
+                            message: '该商品库存不足，请及时上架商品！',
+                            type: 'warning'
+                        })
+                        this.loading = false
+                        return
+                    }
 
                     goods.book.price = (goods.book.price_int/100).toFixed(2)
 
-                    //如果库存为0，加入推荐组，但标记为未推荐
-                    if(goods.amount > 0){
-                        goods.recommend = true
-                    }else{
-                        goods.recommend = false
-                    }
-
-                    this.goods.unshift(resp.data.data[0])
+                    this.goods.unshift(goods)
 
                     if(this.topic_id != ''){
                         //已有话题，添加话题项
                         let topic_goods = {
                             topic_id: this.topic_id,
-                            recommend: true,
                             goods_id: resp.data.data[0].id,
                             operate_type: 'add'
                         }

@@ -70,7 +70,7 @@ export default {
         editTopic(index){
             let topic = this.topics[index]
 
-            this.$router.push({name: 'promotion', params: {topic_id: topic.id, recommend: topic.recommend}})
+            this.$router.push({name: 'promotion', params: {topic_id: topic.id, recommend: topic.recommend, title: topic.title}})
         },
 
 
