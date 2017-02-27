@@ -403,28 +403,47 @@ export default {
                         console.log(new_book)
                         console.log(old_book)
 
+                        var pre_category = this.ruleForm.category, hasPrompt = false
+
                         //图书上架
                         if (new_book.amount > 0) {
+                            this.hasPrompt = true
                             axios.post('/v1/books/pullOnSale', new_book).then(resp => {
                                 this.loading = false
+
+
+
+                                //提示成功
+                                this.$message('上传成功！')
+                                this.$nextTick(()=>{
+                                    $('.isbn_input input').focus()
+                                })
+
                                 this.reset('ruleForm') //清空字段
                                 this.ruleForm.pic = '' //clear pic
+                                this.ruleForm.category = pre_category
+
+                                console.log('******************************');
+                                console.log(pre_category);
+                                console.log(this.ruleForm.category);
+                                console.log('******************************');
                             })
                         }
 
                         if (old_book.amount > 0) {
                             axios.post('/v1/books/pullOnSale', old_book).then(resp => {
                                 this.loading = false
-                                this.reset('ruleForm') //清空字段
-                                this.ruleForm.pic = '' //clear pic
 
-                                //提示成功
-                                this.$message('上传成功！')
-                                this.$nextTick(()=>{
-                                    //保留上一次的类别
-                                    this.ruleForm.category = new_book.category
-                                    $('.isbn_input input').focus()
-                                })
+                                if(!hasPrompt){
+                                    this.$message('上传成功！')
+                                    this.$nextTick(()=>{
+                                        $('.isbn_input input').focus()
+                                    })
+                                    this.reset('ruleForm') //清空字段
+                                    this.ruleForm.pic = '' //clear pic
+
+                                    this.ruleForm.category = pre_category
+                                }
 
                             })
                         }
@@ -442,7 +461,7 @@ export default {
                         if (this.preBook.title != book.title || this.preBook.publisher != book.publisher || this.preBook.pic != book.pic || this.preBook.author != book.author || parseInt(this.preBook.price) != book.price_int) {
                             axios.post('/v1/books/updateBookInfo', book).then(resp => {
                                 // 上架成功
-                                this.reset('ruleForm') //清空字段
+                                // this.reset('ruleForm') //清空字段
                                 this.ruleForm.pic = '' //clear pic
                                 console.log(resp.data)
                             })
