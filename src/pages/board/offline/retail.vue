@@ -219,7 +219,7 @@ export default {
                 }
 
                 axios.post('/v1/orders/offline_sale', {
-                    total_price: total_price, //required   总价 单位分
+                    total_price: parseFloat(total_price)*100, //required   总价 单位分
                     total_amount: total_amount, //required   总数量
                     sales_channel: 2, //销售渠道 2 => 线下零售
                     items: items
