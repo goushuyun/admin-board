@@ -30,7 +30,7 @@
           </el-switch>
         </el-col>
         <el-col :span="6">
-          <el-input v-model.trim="op.isbn" placeholder="请录入ISBN" :autofocus="true" v-on:keyup.enter.native="search"></el-input>
+          <el-input v-model="op.isbn" placeholder="请录入ISBN" :autofocus="true" v-on:keyup.enter.native="search"></el-input>
         </el-col>
         <el-col :span="1">
           <el-button type="primary" icon="search" @click="search">搜索</el-button>
@@ -78,11 +78,9 @@
           width="100">
         </el-table-column>
         <el-table-column
+          prop="amount"
           label="库存量"
           width="100">
-          <template scope="scope">
-            <label>{{scope.row.amount-scope.row.number}}</label>
-          </template>
         </el-table-column>
         <el-table-column
           label="出库量"
@@ -185,6 +183,7 @@ export default {
                 let resp_book = resp.data.data[0]
                 let aaa = resp_book.book
                 var book = {
+                    id: resp_book.id,
                     isbn: resp_book.isbn,
                     title: resp_book.book.title,
                     type: resp_book.type,
@@ -206,24 +205,12 @@ export default {
         },
         buySubmit() {
             if (this.books.length > 0) {
-                var total_amount = function() {
-                    var total_amount = 0
-                    for (var i = 0; i < this.books.length; i++) {
-                        total_amount += this.books[i].number
-                    }
-                    return total_amount
-                }
-
-                var total_price = function() {
-                    var total_price = 0
-                    for (var i = 0; i < this.books.length; i++) {
-                        total_price += this.books[i].number * this.books[i].selling_price
-                    }
-                    return total_price
-                }
-
+                var total_amount = 0
+                var total_price = 0
                 var items = []
                 for (var i = 0; i < this.books.length; i++) {
+                    total_amount += this.books[i].number
+                    total_price += this.books[i].number * this.books[i].selling_price
                     var item = {
                         goods_id: this.books[i].id,
                         number: this.books[i].number
@@ -231,7 +218,7 @@ export default {
                     items.push(item)
                 }
 
-                axios.post('/v1/books/checkStore', {
+                axios.post('/v1/orders/offline_sale', {
                     total_price: total_price, //required   总价 单位分
                     total_amount: total_amount, //required   总数量
                     sales_channel: 2, //销售渠道 2 => 线下零售
@@ -242,7 +229,7 @@ export default {
                             message: '提交订单成功！',
                             type: 'success'
                         })
-                        this.books.splice(0, this.books.length)
+                        // this.books.splice(0, this.books.length)
                     } else {
                         this.$message({
                             message: '提交订单失败！',
