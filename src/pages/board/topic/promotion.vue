@@ -17,7 +17,12 @@
 
     <el-form label-width="80px" :inline="true">
         <el-form-item label="添加书籍">
-            <el-input v-model="isbn" @keyup.enter.native="search" size="small" placeholder="请输入isbn编码" :autofocus="true" :maxlength="13" icon="search" :on-icon-click="search"></el-input>
+            <el-input v-model="isbn" @keyup.enter.native="search" size="small" placeholder="请输入isbn编码" :autofocus="true" :maxlength="13">
+
+            </el-input>
+        </el-form-item>
+        <el-form-item class="btn_bottom">
+            <el-button type="primary" :plain="true" icon="search" size="small" @click="search">搜索</el-button>
         </el-form-item>
         <el-form-item class="btn_bottom">
             <el-button type="primary" size="small" @click="submit">提交发布</el-button>
@@ -156,22 +161,6 @@ export default {
                     this.$message('操作成功！')
                 }
             })
-        },
-
-        changeStatus(index){
-            this.goods[index].recommend = !this.goods[index].recommend
-
-            if(this.topic_id != ''){
-                //修改已有话题的部分话题的推荐属性
-                let topic_goods = {
-                    recommend: this.goods[index].recommend,
-                    goods_id: this.goods[index].id,
-                    topic_id: this.topic_id,
-                    operate_type: 'update'
-                }
-                this.updateTopicGoods(topic_goods)
-            }
-
         },
         delGoods(index){
             this.goods.splice(index, 1)
