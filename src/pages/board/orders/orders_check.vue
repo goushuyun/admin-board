@@ -172,7 +172,7 @@ table.order_items:hover {
     </p>
     <p class="center">
         <el-button type="primary" size="mini" v-if="scope.row.order_status == 2" @click="sendOrder(scope.row.order_id, scope.$index)">发货</el-button>
-        <el-button type="primary" size="mini" v-if="scope.row.order_status == 3" @click="completeOrder(scope.row.order_id, scope.$index)">交易完成</button>
+        <el-button type="primary" size="mini" v-if="scope.row.order_status == 3" @click="completeOrder(scope.row.order_id, scope.$index)">交易完成</el-button>
     </p>
 </div>
 </template>

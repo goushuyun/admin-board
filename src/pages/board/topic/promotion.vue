@@ -41,7 +41,6 @@
                       <el-button size="small" type="text" icon="delete" @click="delGoods(scope.$index)"></el-button>
                 </el-button-group>
             </template>
-
         </el-table-column>
     </el-table>
 

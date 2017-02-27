@@ -20,8 +20,8 @@
         </el-table-column>
         <el-table-column prop="status" label="推荐状态">
             <template scope="scope">
-                <p style="color: #13CE66;" v-if="scope.row.recommend == true">推荐中<p>
-                <p v-if="scope.row.recommend == false">取消推荐<p>
+                <p style="color: #13CE66;" v-if="scope.row.recommend == true">推荐中</p>
+                <p v-if="scope.row.recommend == false">取消推荐</p>
             </template>
         </el-table-column>
         <el-table-column label="操作">
