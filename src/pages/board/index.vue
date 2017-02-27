@@ -90,6 +90,7 @@
                     <i class="el-icon-menu"></i>线下零售
                 </template>
                 <el-menu-item index="/admin/offline_retail">线下零售</el-menu-item>
+                <el-menu-item index="/admin/retail_order">线下订单</el-menu-item>
             </el-submenu>
         </el-menu>
     </div>
