@@ -178,7 +178,7 @@ table.order_items:hover {
 </template>
         </el-table-column>
 
-        <el-table-column prop="total_price" label="实收款">
+        <el-table-column prop="total_price" :formatter="toReadablePrice" label="实收款">
 
         </el-table-column>
     </el-table>
@@ -245,6 +245,9 @@ export default {
         }
     },
     methods: {
+        toReadablePrice(row, column){
+            return '¥' + (row.total_price/100).toFixed(2)
+        },
         viewDetial(order_id) {
             this.$router.push({
                 name: 'order_info',

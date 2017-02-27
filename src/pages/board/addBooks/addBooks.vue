@@ -284,7 +284,7 @@ export default {
                 category: [{
                     type: 'number',
                     required: true,
-                    message: '请填写新旧类型',
+                    message: '请填写图书类型',
                     trigger: 'change'
                 }],
                 store_id: [{
