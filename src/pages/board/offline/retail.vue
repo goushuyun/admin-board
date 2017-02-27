@@ -231,7 +231,11 @@ export default {
                     total_price += this.books[i].number * this.books[i].selling_price
                     var item = {
                         goods_id: this.books[i].id,
-                        number: this.books[i].number
+                        number: this.books[i].number,
+                        book_title: this.books[i].title,
+                        book_price: this.books[i].selling_price,
+                        isbn: this.books[i].isbn,
+                        type: this.books[i].type
                     }
                     items.push(item)
                 }
