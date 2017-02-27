@@ -22,6 +22,7 @@
         <el-col :span="2">
           <el-switch
             :width="64"
+            @change="focusInput"
             v-model="op.type"
             on-text="旧书"
             off-text="新书"
@@ -30,7 +31,7 @@
           </el-switch>
         </el-col>
         <el-col :span="6">
-          <el-input v-model="op.isbn" placeholder="请录入ISBN" :autofocus="true" v-on:keyup.enter.native="search"></el-input>
+          <el-input class="isbn_input" v-model="op.isbn" placeholder="请录入ISBN" :autofocus="true" v-on:keyup.enter.native="search"></el-input>
         </el-col>
         <el-col :span="1">
           <el-button type="primary" icon="search" @click="search">搜索</el-button>
@@ -86,7 +87,7 @@
           label="出库量"
           width="100">
           <template scope="scope">
-            <el-input type="number" min="1" size="small" v-model.number="scope.row.number"></el-input>
+            <el-input type="number" min="1" size="small" v-model.number="scope.row.number" v-on:blur="changeCount(scope.$index,scope.row.number)"></el-input>
           </template>
         </el-table-column>
         <el-table-column
@@ -108,7 +109,7 @@
     <div class="">
       <el-row type="flex" justify="center">
         <el-col :span="4">
-          <el-button type="primary" @click="buySubmit">确认出售</el-button>
+          <el-button type="primary" @click="buySubmit" :disabled="!books.length">确认出售</el-button>
         </el-col>
       </el-row>
     </div>
@@ -146,8 +147,24 @@ export default {
             return parseFloat(total_price).toFixed(2)
         }
     },
+    mounted() {
+        this.focusInput()
+    },
     methods: {
+        changeCount: function(index,number) {
+            if (number<1 || !number) {
+                this.$message({
+                    message: '出库量不能少于1本！',
+                    type: 'error'
+                })
+                this.books[index].number = 1
+            }
+        },
+        focusInput () {
+            $('.isbn_input input').focus()
+        },
         search() {
+            this.focusInput()
             if (!isISBNFormat(this.op.isbn)) {
                 this.$message({
                     message: 'ISBN 码格式不正确！',
@@ -175,7 +192,7 @@ export default {
                 console.log(resp);
                 if (resp.data.code != '00000' || resp.data.data.length <= 0) {
                     this.$message({
-                        message: '很抱歉，没有找到这本书',
+                        message: '没有找到这本' + (type == 1 ? '"新书"' : '"旧书"'),
                         type: 'warning'
                     })
                     return
@@ -202,6 +219,7 @@ export default {
         delete_row(index) {
             console.log(index)
             this.books.splice(index, 1)
+            this.focusInput()
         },
         buySubmit() {
             if (this.books.length > 0) {
@@ -243,6 +261,7 @@ export default {
                     type: 'info'
                 })
             }
+            this.focusInput()
         }
     }
 }
