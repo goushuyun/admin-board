@@ -22,17 +22,10 @@ function stamp2date(dt, fmt) {
 }
 
 function isISBNFormat (isbn){
-
-    console.log(isbn.length === 13)
-
-    console.log(isbn.indexOf('978') === 0)
-
     if(isbn.length === 13){
         //判断是否以 ‘978开头’
         return isbn.indexOf('978') === 0
     }
-
-
     return /^\d{10}$/.test(isbn)
 }
 

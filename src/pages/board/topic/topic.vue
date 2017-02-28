@@ -76,11 +76,22 @@ export default {
 
 
         deleteTopic(id){
-            axios.post('/v1/activity/delete_topic', {id}).then(resp=>{
-                if(resp.data.code == '00000'){
-                    this.$message('删除成功！')
-                    this.getShopTopic()
-                }
+            this.$confirm('你确定要删除这个话题吗?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(()=>{
+                axios.post('/v1/activity/delete_topic', {id}).then(resp=>{
+                    if(resp.data.code == '00000'){
+                        this.$message('删除成功！')
+                        this.getShopTopic()
+                    }
+                })
+            }).catch(()=>{
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });
             })
         },
 

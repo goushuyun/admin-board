@@ -532,23 +532,59 @@ export default {
                     }
                     this.total = true
                     var resp_books = resp.data.data
+
+                    //自动补全 类型
+                    this.ruleForm.category = resp_books[0].category
+
+
                     for (var i = 0; i < resp_books.length; i++) {
                         var resp_book = resp_books[i]
+                        var discount = parseFloat(resp_book.selling_price / resp_book.book.price_int * 10).toFixed(1)
                         var book = {
                             type: resp_book.type,
-                            discount: parseFloat(resp_book.selling_price / resp_book.book.price_int * 10).toFixed(1) + ' 折',
+                            discount: discount + ' 折',
                             selling_price: parseFloat(resp_book.selling_price / 100).toFixed(2),
                             amount: resp_book.amount,
                             store_shelf: resp_book.store.name + "-" + resp_book.shelf.name
                         }
                         if (resp_book.type == 1) {
                             this.new_book = book
-                        } else {
+
+                            //补全新书上架信息
+                            this.ruleForm.new_book_store_id = resp_book.store_id
+                            this.ruleForm.new_book_discount = discount
+                            var shelf_id = resp_book.shelf_id
+                            this.$nextTick(()=>{
+                                this.ruleForm.new_book_shelf_id = shelf_id
+                            })
+                        } else if(resp_book.type == 2) {
                             this.old_book = book
+
+                            this.ruleForm.old_book_store_id = resp_book.store_id
+                            this.ruleForm.old_book_discount = discount
+                            let shelf_id = resp_book.shelf_id
+                            this.$nextTick(()=>{
+                                this.ruleForm.old_book_shelf_id = shelf_id
+                            })
                         }
                     }
                 })
             },
+
+            /*
+            //新书
+            new_book_store_id: '',
+            new_book_shelf_id: '',
+            new_book_discount: 0,
+            new_book_amount: 0,
+
+            //二手书
+            old_book_store_id: '',
+            old_book_shelf_id: '',
+            old_book_discount: 0,
+            old_book_amount: 0
+            */
+
             changePic() {
                 $('#imageFile').click()
 
