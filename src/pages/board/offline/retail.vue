@@ -233,7 +233,7 @@ export default {
                         goods_id: this.books[i].id,
                         number: this.books[i].number,
                         book_title: this.books[i].title,
-                        book_price: this.books[i].selling_price,
+                        book_price: this.books[i].selling_price * 100,
                         isbn: this.books[i].isbn,
                         type: this.books[i].type
                     }
@@ -251,7 +251,7 @@ export default {
                             message: '提交订单成功！',
                             type: 'success'
                         })
-                        // this.books.splice(0, this.books.length)
+                        this.books.splice(0, this.books.length)
                     } else {
                         this.$message({
                             message: '提交订单失败！',
