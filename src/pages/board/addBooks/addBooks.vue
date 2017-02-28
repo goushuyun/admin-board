@@ -445,6 +445,7 @@ export default {
                                 // 上架成功
                                 this.reset('ruleForm') //清空字段
                                 this.ruleForm.pic = '' //clear pic
+                                this.total = false //隐藏原始原始库存信息
                                 console.log(resp.data)
                             })
                         }
