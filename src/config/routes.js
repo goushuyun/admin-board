@@ -8,7 +8,7 @@ export default [{
     component: require('../pages/board'),
     children: [{
         name: 'addBooks',
-        path: 'demo',
+        path: 'addBooks',
         component: require('../pages/board/addBooks/addBooks')
     }, {
         name: 'shelves',
@@ -46,5 +46,9 @@ export default [{
         name: 'retail_order',
         path: 'retail_order',
         component: require('../pages/board/offline/retail_order')
+    },{
+        name: 'excel_upload',
+        path: 'excel_upload',
+        component: require('../pages/board/addBooks/excel_upload')
     }]
 }]

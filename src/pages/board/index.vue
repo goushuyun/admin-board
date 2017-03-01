@@ -63,8 +63,8 @@
                 <template slot="title">
                     <i class="el-icon-menu"></i>图书上架
                 </template>
-                <el-menu-item index="/admin/demo">ISBN搜索入库</el-menu-item>
-                <!-- <el-menu-item index="2-2">Excel上传入库</el-menu-item> -->
+                <el-menu-item index="/admin/addBooks">ISBN搜索入库</el-menu-item>
+                <el-menu-item index="/admin/excel_upload">Excel上传入库</el-menu-item>
             </el-submenu>
             <el-submenu index="2">
                 <template slot="title">
