@@ -37,6 +37,7 @@ div.content {
             <el-form-item label="库存数量">
                 <el-select v-model="search_by_number" @change="changeSearchByNumber">
                     <el-option label="有货" value="has"></el-option>
+                    <el-option label="所有" value="all"></el-option>
                     <el-option label="少量货" value="little"></el-option>
                     <el-option label="无货" value="no"></el-option>
                 </el-select>
@@ -130,9 +131,9 @@ export default {
     data() {
             return {
                 total: 0,
-                search_by_number: 'has',
+                search_by_number: 'all',
 
-                min_number: 1,
+                min_number: 0,
                 max_number: 0,
                 page: 1,
                 size: 10,
@@ -176,9 +177,6 @@ export default {
                         });
                         return
                     }
-
-
-                    console.log(this.backup_data)
 
                     //检查数据是否更新
                     if (this.store_id != this.backup_data.store_id || this.shelf_id != this.backup_data.shelf_id || this.backup_data.amount != this.dialog_goods.amount || this.backup_data.selling_price != this.dialog_goods.selling_price) {
@@ -253,19 +251,21 @@ export default {
                 },
 
                 changeSearchByNumber() {
-
                     if (this.search_by_number == 'little') {
                         this.min_number = 1
-                        this.max_number = 6
+                        this.max_number = 11
                     } else if (this.search_by_number == 'no') {
                         this.min_number = 0
                         this.max_number = 1
                     } else if (this.search_by_number == 'has') {
+                        this.min_number = 1
+                        this.max_number = 0
+                    }else if (this.search_by_number == 'all') {
                         this.min_number = 0
                         this.max_number = 0
                     }
-                    this.getData()
 
+                    this.getData()
                 },
                 changeType() {
                     this.getData()
