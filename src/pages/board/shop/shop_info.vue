@@ -5,16 +5,40 @@ div#container {
 }
 
 .card_body {
-    text-align: center;
+    display: flex;
+    justify-content: center;
 }
 
-.logo_image {
-    width: 200px;
-    height: 200px;
-    border: 1px solid #dbdbdb;
-    border-radius: 6px;
-    margin-top: 8px;
-}
+.avatar-uploader{
+   border: 1px dashed #bfcbd9;
+   border-radius: 6px;
+   cursor: pointer;
+   position: relative;
+   overflow: hidden;
+   width: 200px;
+   height: 200px;
+ }
+ .avatar-uploader-icon {
+   font-size: 28px;
+   color: #8c939d;
+   width: 200px;
+   height: 200px;
+   line-height: 178px;
+   text-align: center;
+ }
+ .avatar {
+   width: 200px;
+   height: 200px;
+   display: block;
+ }
+ .tip {
+   padding: 15px 0;
+   text-align: center;
+   font-size: 14px;
+   height: 20px;
+   line-height: 20px;
+   color: #bfcbd9;
+ }
 
 </style>
 
@@ -23,20 +47,19 @@ div#container {
 <div id="container">
     <el-form ref="form" :form="form" label-width="100px">
         <el-form-item label="店铺头像">
-            <el-card class="card_body" :body-style="{ padding: '0px'}">
-                <form id="upload_form" action="http://upload.qiniu.com/" method="post" enctype="multipart/form-data">
-                    <input id="imageFile" v-show="false" name="file" type="file" accept="image/*" @change="fileChange">
-                    <input type="hidden" name="key" :value="'shop/'+shop_id">
-                    <input type="hidden" name="token" :value="token">
-                    <img :src="form.logo" class="logo_image">
-                    <div style="padding: 14px;">
-                        <div class="bottom clearfix">
-                            <el-button type="text" class="button" @click="changeShopLogo">上传头像</el-button>
-                        </div>
-                    </div>
-                </form>
+            <el-card class="card_body">
+                <div v-if="form.logo">
+                  <el-upload class="avatar-uploader" action="http://upload.qiniu.com/" :data="requestData" :show-file-list="false" :on-success="handleAvatarScucess">
+                    <img v-if="form.logo" :src="form.logo" class="avatar">
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                  </el-upload>
+                </div>
+                <div v-else><i class="avatar-uploader el-icon-plus avatar-uploader-icon"></i></div>
+                <div class="tip">点击更改</div>
             </el-card>
         </el-form-item>
+
+
         <el-form-item label="商家名称">
             <el-input :disabled="disabled" v-model="form.shop_name"></el-input>
         </el-form-item>
@@ -63,6 +86,9 @@ import uploadImage from "../../../scripts/uploadImage"
 export default {
     mixins: [uploadImage],
     methods: {
+        handleAvatarScucess(res, file) {
+            this.form.logo = URL.createObjectURL(file.raw);
+        },
         submit(){
             if (this.disabled){
                 this.disabled = false
@@ -78,22 +104,6 @@ export default {
                     }
                 })
             }
-        },
-        fileChange(){
-            this.uploadShopLogo()
-        },
-        changeShopLogo(){
-            $('#imageFile').click()
-
-            //获取token
-            axios.post('/v1/mediastore/getUpToken', {
-                zone: 1,
-                key: 'shop/' + this.shop_id
-            }).then(resp => {
-                this.token = resp.data.data.token
-
-                console.log(this.token)
-            })
         }
     },
     mounted(){
@@ -107,11 +117,24 @@ export default {
         this.form.address = adminInfo.shop.address
         this.form.introduction = adminInfo.shop.introduction
         this.form.logo = adminInfo.shop.logo
+        //获取token
+        axios.post('/v1/mediastore/getUpToken', {
+            zone: 1,
+            key: 'shop/' + this.shop_id
+        }).then(resp => {
+            this.requestData.key = 'shop/' + this.shop_id
+            this.requestData.token = resp.data.data.token
+
+            console.log(this.token)
+        })
     },
 
     data() {
         return {
-            token: '',
+            requestData: {
+              key:'',
+              token: ''
+            },
             shop_id: '',
             disabled: true,
             form: {

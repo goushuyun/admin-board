@@ -4,20 +4,35 @@ div.left {
     display: inline-block;
     padding-left: 12px;
     vertical-align: top;
-    .book_img {
-        border: 1px solid #efefef;
-        border-radius: 4px;
-        display: block;
-        margin: 0 auto;
-        width: 180px;
-        height: 200px;
-        margin-bottom: 12px;
-    }
-    .changePic {
-        width: 120px;
-        display: block;
-        margin: 0 auto;
-    }
+    width: 182px;
+    .avatar-uploader{
+       border: 1px dashed #bfcbd9;
+       border-radius: 6px;
+       cursor: pointer;
+       position: relative;
+       overflow: hidden;
+       width: 180px;
+       height: 215px;
+     }
+     .avatar-uploader-icon {
+       font-size: 28px;
+       color: #8c939d;
+       width: 180px;
+       height: 215px;
+       line-height: 178px;
+       text-align: center;
+     }
+     .avatar {
+       width: 180px;
+       height: 215px;
+       display: block;
+     }
+     .tip {
+       padding: 15px 0;
+       text-align: center;
+       font-size: 14px;
+       color: #bfcbd9;
+     }
 }
 
 div.right {
@@ -50,7 +65,7 @@ div.right {
 
 .pro_info {
   width: 182px;
-  margin-top: 35px;
+  margin-top: 20px;
   text-align: center;
   border: 1px solid #bfcbd9;
   font-size: 14px;
@@ -78,19 +93,24 @@ div.right {
     border-right: 1px dashed #bfcbd9;
   }
 }
+
+
 </style>
 
 <template lang="html">
 
 <div class="content" v-loading="loading" :element-loading-text="loading_text">
     <div class="left">
-        <form id="upload_form" action="http://upload.qiniu.com/" method="post" enctype="multipart/form-data">
-            <input id="imageFile" v-show="false" name="file" type="file" accept="image/*" @change="fileChange">
-            <input type="hidden" name="key" :value="ruleForm.isbn">
-            <input type="hidden" name="token" :value="token">
-            <img class="book_img" :src="ruleForm.pic" alt="" />
-            <el-button id="change_image_btn" class="changePic" @click="changePic" :disabled="ruleForm.isbn == ''">更换图片</el-button>
-        </form>
+      
+        <div v-if="ruleForm.isbn">
+          <el-upload class="avatar-uploader" action="http://upload.qiniu.com/" :data="requestData" :show-file-list="false" :on-success="handleAvatarScucess">
+            <img v-if="ruleForm.pic" :src="ruleForm.pic" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </div>
+        <div v-else><i class="avatar-uploader el-icon-plus avatar-uploader-icon"></i></div>
+        <div slot="tip" class="tip">点击更改</div>
+
         <div class="pro_info" v-if="total">
           <div class="title border-bottom">原有库存信息</div>
           <div class="row border-bottom">
@@ -257,7 +277,10 @@ export default {
             stores: [],
             new_shelves: [],
             old_shelves: [],
-            token: '',
+            requestData: {
+              key:'',
+              token: ''
+            },
 
             rules: {
                 title: [{
@@ -326,6 +349,9 @@ export default {
         this.categories = enumVals.categories
     },
     methods: {
+        handleAvatarScucess(res, file) {
+            this.ruleForm.pic = URL.createObjectURL(file.raw);
+        },
         clear_input(type){
             if(type=='new'){
                 this.ruleForm.new_book_discount = ''
@@ -457,9 +483,6 @@ export default {
                 });
 
             },
-            fileChange() {
-                this.submitUploadForm()
-            },
             chooseShelf() {
 
             },
@@ -569,6 +592,7 @@ export default {
                         }
                     }
                 })
+                this.changePic()
             },
 
             /*
@@ -586,15 +610,19 @@ export default {
             */
 
             changePic() {
-                $('#imageFile').click()
+                // $('#imageFile').click()
 
                 //获取token
                 axios.post('/v1/mediastore/getUpToken', {
                     zone: 1,
                     key: this.ruleForm.isbn
                 }).then(resp => {
-                    this.token = resp.data.data.token
-                })
+                    this.requestData.key = this.ruleForm.isbn
+                    this.requestData.token = resp.data.data.token
+                    return true
+                }).catch(() => {
+                    return false
+                });
             }
     }
 }
