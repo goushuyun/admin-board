@@ -54,7 +54,7 @@ div p {
 
 <template lang="html">
   <div>
-    <el-card class="box-card">
+    <div class="box-card">
       <div class="example">
           <p>如果您还没有下载样例文件，请点击<a href="https://www.baidu.com">下载样例文件</a>，并编辑好商品信息后上传。</p>
       </div>
@@ -76,7 +76,7 @@ div p {
          <p>类型：1.新书 2.旧书</p>
          <p>仓库名、货架名：请使用完整的仓库名、货架名</p>
       </div>
-    </el-card>
+    </div>
 
     <el-dialog :show-close="false" :close-on-press-escape="false" :close-on-click-modal="false" v-model="dialogTableVisible">
       <div slot="title" class="dialog-title">
