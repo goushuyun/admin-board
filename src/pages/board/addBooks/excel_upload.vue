@@ -3,7 +3,7 @@
     width: 600px;
     margin-left: 15px;
     .excel_upload {
-        margin: 20px 0 20px 80px;
+        margin: 20px;
     }
     .error {
         margin: 40px 0;
@@ -50,20 +50,25 @@ div p {
       border: 1px solid;
     }
 }
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    .el-button {
+        margin: 10px;
+    }
+}
 </style>
 
 <template lang="html">
   <div>
-    <el-card class="box-card">
+    <div class="box-card">
       <div class="example">
           <p>如果您还没有下载样例文件，请点击<a href="https://www.baidu.com">下载样例文件</a>，并编辑好商品信息后上传。</p>
       </div>
       <div class="excel_upload">
-          <el-upload name="excel" drag action="/v1/file/upload_books_excel" :show-file-list="true" :before-upload="beforeUpload">
-              <i class="el-icon-upload"></i>
-              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-              <div class="el-upload__tip" slot="tip">只能上传xlsx文件，且不超过500kb</div>
-          </el-upload>
+          <el-button size="small" type="primary" @click="showDialog">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传xlsx文件，且不超过500kb</div>
       </div>
       <div class="error">
         <p><span>文件有误：</span><a href="https://www.baidu.com">xxxxxxx.xls</a>请点击下载此文件，按照要求修改后重新上传。</p>
@@ -76,10 +81,10 @@ div p {
          <p>类型：1.新书 2.旧书</p>
          <p>仓库名、货架名：请使用完整的仓库名、货架名</p>
       </div>
-    </el-card>
+    </div>
 
-    <el-dialog :show-close="false" :close-on-press-escape="false" :close-on-click-modal="false" v-model="dialogTableVisible">
-      <div slot="title" class="dialog-title">
+    <el-dialog :show-close="false" :close-on-press-escape="false" :close-on-click-modal="false" v-model="dialogVisible">
+      <div class="dialog-title">
           <img src="src/images/warning.png"/><span>警告</span>
       </div>
       <div>
@@ -92,9 +97,11 @@ div p {
       <div class="warning_pic">
           <img src="src/images/upload_warning.jpg">
       </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogTableVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogTableVisible = false">确 定</el-button>
+      <div class="dialog-footer footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-upload class="upload-demo" action="/v1/file/upload_books_excel" :on-preview="handlePreview" :on-success="handleSuccess" :on-error="handleError">
+          <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        </el-upload>
       </div>
     </el-dialog>
   </div>
@@ -104,13 +111,22 @@ div p {
 export default {
     data() {
         return {
-            dialogTableVisible: false
+            dialogVisible: false
         }
     },
     methods: {
-        beforeUpload(file) {
-            this.dialogTableVisible = true
-        }
+      handleSuccess(response, file, fileList) {
+        console.log('success!');
+      },
+      handleError(err, file, fileList) {
+        console.log('error!');
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      showDialog(){
+        this.dialogVisible = true
+      }
     }
 }
 </script>
