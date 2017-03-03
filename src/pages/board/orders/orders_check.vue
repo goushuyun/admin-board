@@ -48,6 +48,12 @@ div.content {
 table.order_items:hover {
     background-color: #EFF2F7;
 }
+.el-select{
+    width: 110px;
+}
+.el-input {
+    width: 400px;
+}
 </style>
 
 <template lang="html">
@@ -60,16 +66,15 @@ table.order_items:hover {
             </el-form-item>
 
             <el-form-item>
-                <el-select v-model="searchType" placeholder="筛选条件" size="small" @change="changeSearchType">
-                    <el-option label="订单编号" value="order_id"></el-option>
-                    <el-option label="收货人手机号" value="user_tel"></el-option>
-                    <el-option label="收货人姓名" value="user_name"></el-option>
-                    <!-- <el-option label="ISBN(包括)" value="beijing"></el-option> -->
-                </el-select>
+                <el-input placeholder="搜索值" v-model="searchValue" size="small">
+                    <el-select v-model="searchType" slot="prepend" placeholder="筛选条件" size="small" @change="changeSearchType">
+                        <el-option label="订单编号" value="order_id"></el-option>
+                        <el-option label="收货人手机号" value="user_tel"></el-option>
+                        <el-option label="收货人姓名" value="user_name"></el-option>
+                    </el-select>
+                </el-input>
             </el-form-item>
-            <el-form-item>
-                <el-input size="small" v-model="searchValue" placeholder="搜索值"></el-input>
-            </el-form-item>
+
             <el-form-item>
                 <el-select v-model="order_status" placeholder="订单状态" size="small">
                     <el-option label="待发货" value="2"></el-option>
