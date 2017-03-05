@@ -22,28 +22,35 @@ div.content {
     <div class="search_item">
         <el-form :inline="true">
             <el-form-item label="书名">
-                <el-input v-model="title"></el-input>
+                <el-input v-model="title" size="small"></el-input>
             </el-form-item>
             <el-form-item label="ISBN">
-                <el-input v-model="isbn"></el-input>
+                <el-input v-model="isbn" size="small"></el-input>
             </el-form-item>
             <el-form-item label="图书类型">
-                <el-select v-model="type" @change="getData">
+                <el-select v-model="type" @change="getData" size="small">
                     <el-option label="新书" :value="1"></el-option>
                     <el-option label="二手书" :value="2"></el-option>
                     <el-option label="所有" :value="0"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="库存数量">
-                <el-select v-model="search_by_number" @change="changeSearchByNumber">
+                <el-select v-model="search_by_number" @change="changeSearchByNumber" size="small">
                     <el-option label="有货" value="has"></el-option>
                     <el-option label="所有" value="all"></el-option>
                     <el-option label="少量货" value="little"></el-option>
                     <el-option label="无货" value="no"></el-option>
                 </el-select>
             </el-form-item>
+            <el-form-item label="是否有图">
+                <el-select size="small" v-model="has_pic" @change="choosePicStatus">
+                    <el-option label="有图片" :value="1"></el-option>
+                    <el-option label="无图片" :value="2"></el-option>
+                    <el-option label="所有" :value="0"></el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item class="btn_bottom">
-                <el-button type="primary" @click="getData">查询
+                <el-button type="primary" @click="getData" size="small">查询
                     <i class="el-icon-search"></i>
                 </el-button>
             </el-form-item>
@@ -95,6 +102,14 @@ div.content {
             <el-form-item label="数量">
                 <el-input-number  style="width:100%;" v-model="dialog_goods.amount" :min="0" :max="9999"></el-input-number>
             </el-form-item>
+
+            <el-form-item label="类别">
+                <el-select style="width:100%;" v-model="dialog_goods.category">
+                    <el-option v-for="category in categories" :label="category.name" :value="category.val">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+
             <el-form-item label="位置">
                 <el-col :span="11">
                     <el-select v-model="store_id" style="width: 100%;" placeholder="仓库位置" @change="chooseStore">
@@ -127,6 +142,7 @@ import {
 }
 from '../../../scripts/utils'
 import axios from "../../../scripts/http"
+import enumVals from "../../../scripts/enum"
 export default {
     data() {
             return {
@@ -143,10 +159,14 @@ export default {
                 tableData: [],
                 loading: false,
 
+                // 是否有图片
+                has_pic: 0,
+
                 // 弹框数据
                 boxVisible: false,
                 stores: [],
                 shelves: [],
+
                 // 货架位置
                 store_id: '',
                 shelf_id: '',
@@ -156,6 +176,8 @@ export default {
 
                 //选中弹出的模态框数据备份
                 backup_data: {},
+
+                categories: []
             }
         },
         mounted() {
@@ -166,8 +188,12 @@ export default {
                 this.stores = resp.data.data
             })
 
+            this.categories = enumVals.categories
         },
         methods: {
+            choosePicStatus(){
+                this.getData()
+            },
             confirmModify() {
                     //校验弹框中的数据，库位选填
                     if ((typeof this.dialog_goods.selling_price) == 'string') {
@@ -179,9 +205,9 @@ export default {
                     }
 
                     //检查数据是否更新
-                    if (this.store_id != this.backup_data.store_id || this.shelf_id != this.backup_data.shelf_id || this.backup_data.amount != this.dialog_goods.amount || this.backup_data.selling_price != this.dialog_goods.selling_price) {
-                        //数据有更新,封装更新数据，提交更新
+                    if (this.store_id != this.backup_data.store_id || this.shelf_id != this.backup_data.shelf_id || this.backup_data.amount != this.dialog_goods.amount || this.backup_data.selling_price != this.dialog_goods.selling_price || this.backup_data.category != this.dialog_goods.category) {
 
+                        //数据有更新,封装更新数据，提交更新
                         this.btn_loading = true
 
                         let data = {
@@ -189,7 +215,8 @@ export default {
                             store_id: this.store_id,
                             shelf_id: this.shelf_id,
                             amount: this.dialog_goods.amount,
-                            selling_price: this.dialog_goods.selling_price * 100
+                            selling_price: parseInt(this.dialog_goods.selling_price * 100),
+                            category: this.dialog_goods.category
                         }
 
                         axios.post('/v1/books/modify_store_goods', data).then(res => {
@@ -222,11 +249,15 @@ export default {
                 modify(index) {
                     //数据备份
                     var modify_goods = this.tableData[index]
+
+                    console.log(modify_goods);
+
                     this.backup_data.id = modify_goods.id
                     this.backup_data.selling_price = modify_goods.selling_price
                     this.backup_data.amount = modify_goods.amount
-                    // this.backup_data.store_id = modify_goods.store_id
-                    // this.backup_data.shelf_id = modify_goods.shelf_id
+                    this.backup_data.store_id = modify_goods.store_id
+                    this.backup_data.shelf_id = modify_goods.shelf_id
+                    this.backup_data.category = modify_goods.category
 
                     //整理渲染数据
                     this.dialog_goods = modify_goods
@@ -285,6 +316,7 @@ export default {
                         size: this.size,
                         type: this.type,
                         title: this.title,
+                        has_pic: this.has_pic,
                         isbn: this.isbn,
                         max_number: this.max_number,
                         min_number: this.min_number
