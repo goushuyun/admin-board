@@ -130,7 +130,6 @@ export default {
     mounted() {
         axios.post('/v1/store/listStores', {}).then(resp => {
             this.stores = resp.data.data
-            console.log(this.stores);
         })
     },
     methods: {
@@ -173,6 +172,7 @@ export default {
                     if (arr.length > 11) {
                         arr.splice(11, 1)
                     }
+                    console.log(arr);
                     success.push(arr)
                 } else {
                     // 向错误数据末尾插入错误提示
@@ -257,7 +257,9 @@ export default {
                 obj.message = '货架名错误'
                 return obj
             }
-            return true
+            obj.success = true
+            obj.message = '没有错误'
+            return obj
         },
         checkAgain() {
             var self = this
