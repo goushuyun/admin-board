@@ -88,6 +88,9 @@
 
       <el-card v-if="upload_status==2" v-loading="check_loading" class="box-card">
         <div slot="header" class="clearfix"><span>校验结果</span><strong>{{'（'+check_success.length+'条数据校验成功；'+(check_fail.length-1)+'条数据校验失败！）'}}</strong></div>
+        <div class="" v-show="check_fail.length>1">
+          <el-alert title="以下为校验失败的数据，您可以参考每行末尾的“错误提示”直接在当前页面进行修改并“重新校验”，也可以选择放弃下方的错误数据“直接上传”。" type="error" show-icon></el-alert>
+        </div>
         <div id="grid" class="hot handsontable htRowHeaders htColumnHeaders" data-originalstyle="height: 320px; overflow: hidden; width: 584px;"></div>
         <div class="btn">
           <el-button type="primary" v-show="check_fail.length>1" @click="checkAgain">重新校验</el-button>
@@ -164,50 +167,80 @@ export default {
             var success = self.check_success
             var fail = []
             array.forEach(function(arr) {
-                if (self.checkItem(arr)) {
+                var obj = self.checkItem(arr)
+                if (obj.success) {
+                    // 删除再次校验的时候插入的提示信息
+                    if (arr.length > 11) {
+                        arr.splice(11, 1)
+                    }
                     success.push(arr)
                 } else {
+                    // 向错误数据末尾插入错误提示
+                    arr.push(obj.message)
                     fail.push(arr)
                 }
             })
             self.check_success = success
+            // 修改表头
+            fail.splice(0, 1)
+            fail.unshift(['ISBN', '书名', '出版社', '作者', '原价', '数量', '折扣', '类别', '新旧', '仓库名', '货架名', '错误提示'])
+
             self.check_fail = fail
         },
         checkItem(array) {
+            var obj = {}
             if (array[0].length != 10 && array[0].length !== 13) {
-                return false
+                obj.success = false
+                obj.message = 'ISBN错误'
+                return obj
             }
             if (!array[1]) {
-                return false
+                obj.success = false
+                obj.message = '书名错误'
+                return obj
             }
             if (!array[2]) {
-                return false
+                obj.success = false
+                obj.message = '出版社错误'
+                return obj
             }
             if (!array[3]) {
-                return false
+                obj.success = false
+                obj.message = '作者错误'
+                return obj
             }
             if (!(Number(array[4]) > 0)) {
-                return false
+                obj.success = false
+                obj.message = '原价错误'
+                return obj
             }
             if (!(parseFloat(array[5]) == parseInt(array[5]))) {
-                return false
+                obj.success = false
+                obj.message = '数量错误'
+                return obj
             }
             if (!(parseFloat(array[6]) > 0 || parseFloat(array[6]) <= 1)) {
-                return false
+                obj.success = false
+                obj.message = '折扣错误'
+                return obj
             }
             if (['1', '2', '3', '4', '5'].indexOf(array[7]) == -1) {
-                return false
+                obj.success = false
+                obj.message = '类别错误'
+                return obj
             }
             if (['1', '2'].indexOf(array[8]) == -1) {
-                return false
+                obj.success = false
+                obj.message = '新旧错误'
+                return obj
             }
             var exist_store = false
             var exist_shelf = false
-            this.stores.forEach(function(store){
+            this.stores.forEach(function(store) {
                 if (store.name == array[9]) {
                     exist_store = true
                     var shelves = store.shelves
-                    shelves.forEach(function(shelf){
+                    shelves.forEach(function(shelf) {
                         if (shelf.name == array[10]) {
                             exist_shelf = true
                         }
@@ -215,10 +248,14 @@ export default {
                 }
             })
             if (!exist_store) {
-                return false
+                obj.success = false
+                obj.message = '仓库名错误'
+                return obj
             }
             if (!exist_shelf) {
-                return false
+                obj.success = false
+                obj.message = '货架名错误'
+                return obj
             }
             return true
         },
@@ -255,11 +292,11 @@ export default {
             array.forEach(function(arr) {
                 var store = ''
                 var shelf = ''
-                this.stores.forEach(function(store){
+                this.stores.forEach(function(store) {
                     if (store.name == arr[9]) {
                         store = store.id
                         var shelves = store.shelves
-                        shelves.forEach(function(shelf){
+                        shelves.forEach(function(shelf) {
                             if (shelf.name == array[10]) {
                                 shelf = shelf.id
                             }
@@ -286,7 +323,7 @@ export default {
         },
         partUpload() {
             var self = this
-            self.$confirm('此操作将放弃校验未通过的数据, 是否继续?', '提示', {
+            self.$confirm('此操作将放弃校验失败的数据, 直接上传校验成功的数据，是否继续?', '提示', {
                 confirmButtonText: '继续上传',
                 cancelButtonText: '返回修改',
                 type: 'warning'
