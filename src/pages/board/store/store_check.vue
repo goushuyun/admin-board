@@ -12,6 +12,36 @@ div.content {
         margin-top: 12px;
         text-align: right;
     }
+    .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        width: 112px;
+        height: 158px;
+        padding: 2px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .el-upload:hover {
+        border-color: #20a0ff;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+    .avatar {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
 }
 
 </style>
@@ -79,7 +109,8 @@ div.content {
             </el-table-column>
             <el-table-column label="操作" fixed="right">
                 <template scope="scope">
-                    <el-button type="text" size="small" @click="modify(scope.$index)">修改</el-button>
+                    <el-button type="text" size="small" @click="modify(scope.$index)" icon="edit"></el-button>
+                    <el-button type="text" size="small" @click="delGoods(scope.$index)" icon="delete"></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -96,11 +127,18 @@ div.content {
             <el-form-item label="书名">
                 {{dialog_book.title}}
             </el-form-item>
+            <el-form-item label="图片">
+                <el-upload class="avatar-uploader" action="http://upload.qiniu.com/" :data="upload_data" :show-upload-list="false" :on-success="uploadSuccess">
+                    <img v-if="pic" :src="pic" class="avatar">
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+            </el-form-item>
             <el-form-item label="售价">
                 <el-input v-model="dialog_goods.selling_price" min="0"></el-input>
             </el-form-item>
+
             <el-form-item label="数量">
-                <el-input-number  style="width:100%;" v-model="dialog_goods.amount" :min="0" :max="9999"></el-input-number>
+                <el-input-number style="width:100%;" v-model="dialog_goods.amount" :min="0" :max="9999"></el-input-number>
             </el-form-item>
 
             <el-form-item label="类别">
@@ -138,14 +176,22 @@ div.content {
 
 //setting filter
 import {
-    stamp2date
+    stamp2date, getTimeVal
 }
 from '../../../scripts/utils'
 import axios from "../../../scripts/http"
+import {getToken} from "../../../scripts/token"
 import enumVals from "../../../scripts/enum"
 export default {
     data() {
             return {
+                //上传图片参数
+                upload_data: {
+                    key: '',
+                    token: '',
+                    url: ''
+                },
+
                 total: 0,
                 search_by_number: 'all',
 
@@ -166,6 +212,7 @@ export default {
                 boxVisible: false,
                 stores: [],
                 shelves: [],
+                pic: '',
 
                 // 货架位置
                 store_id: '',
@@ -191,10 +238,66 @@ export default {
             this.categories = enumVals.categories
         },
         methods: {
-            choosePicStatus(){
-                this.getData()
-            },
-            confirmModify() {
+            delGoods(index) {
+                    var del_goods = this.tableData[index]
+
+                    this.$confirm('此操作将下架该商品, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        axios.post('/v1/books/off_the_shelf', {
+                            id: del_goods.id
+                        }).then(resp => {
+                            this.tableData.splice(index, 1)
+
+                            this.$message({
+                                type: 'success',
+                                message: '下架成功!'
+                            })
+
+                        })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消下架'
+                        })
+                    });
+
+                },
+                uploadSuccess(resp, file, fileList) {
+                    //获取dialog_goods  的isbn
+
+                    console.log(this.dialog_goods.isbn);
+
+                    console.log(resp.key);
+
+
+                    axios.post('/v1/books/set_book_pic_by_isbn', {
+                        pic: this.upload_data.url,
+                        isbn: this.dialog_goods.isbn
+                    }).then(resp=>{
+                        if(resp.data.code == '00000'){
+                            this.getData()
+                            console.log('upload image ok !');
+                        }
+                    })
+
+                    if (this.pic == '') {
+                        //之前没有图片，对book做插入图片操作
+
+                        console.log(resp.key);
+                    }
+
+                    this.pic = file.url
+
+                    console.log(file);
+                    console.log(fileList);
+                },
+                choosePicStatus() {
+                    this.getData()
+                },
+                confirmModify() {
                     //校验弹框中的数据，库位选填
                     if ((typeof this.dialog_goods.selling_price) == 'string') {
                         this.$message({
@@ -225,10 +328,13 @@ export default {
                                 this.boxVisible = false
                                 this.getData()
                                 this.btn_loading = false
+
+                                this.pic = ''
                             }
                         })
                     } else {
                         this.boxVisible = false
+                        this.pic = ''
                     }
 
                 },
@@ -252,6 +358,16 @@ export default {
 
                     console.log(modify_goods);
 
+                    // 准备修改图片的参数
+                    let key = 'book/' + modify_goods.isbn
+                    getToken(key).then( res=> {
+                        this.upload_data.key = key
+                        this.upload_data.token = res.data.token
+                        this.upload_data.url = res.data.url
+
+                        console.log(this.upload_data);
+                    })
+
                     this.backup_data.id = modify_goods.id
                     this.backup_data.selling_price = modify_goods.selling_price
                     this.backup_data.amount = modify_goods.amount
@@ -262,6 +378,10 @@ export default {
                     //整理渲染数据
                     this.dialog_goods = modify_goods
                     this.dialog_book = this.dialog_goods.book
+
+                    if (modify_goods.book.pic != '') {
+                        this.pic = modify_goods.book.pic + '?' + getTimeVal()
+                    }
 
                     this.boxVisible = true
 
@@ -291,7 +411,7 @@ export default {
                     } else if (this.search_by_number == 'has') {
                         this.min_number = 1
                         this.max_number = 0
-                    }else if (this.search_by_number == 'all') {
+                    } else if (this.search_by_number == 'all') {
                         this.min_number = 0
                         this.max_number = 0
                     }
