@@ -237,6 +237,13 @@ export default {
 
             this.categories = enumVals.categories
         },
+        watch: {
+            boxVisible: function(val, oldVal){
+                if(val == false){
+                    this.pic = ''
+                }
+            }
+        },
         methods: {
             delGoods(index) {
                     var del_goods = this.tableData[index]
@@ -268,31 +275,23 @@ export default {
                 uploadSuccess(resp, file, fileList) {
                     //获取dialog_goods  的isbn
 
-                    console.log(this.dialog_goods.isbn);
-
-                    console.log(resp.key);
-
-
-                    axios.post('/v1/books/set_book_pic_by_isbn', {
-                        pic: this.upload_data.url,
-                        isbn: this.dialog_goods.isbn
-                    }).then(resp=>{
-                        if(resp.data.code == '00000'){
-                            this.getData()
-                            console.log('upload image ok !');
-                        }
-                    })
-
                     if (this.pic == '') {
                         //之前没有图片，对book做插入图片操作
-
                         console.log(resp.key);
+
+                        axios.post('/v1/books/set_book_pic_by_isbn', {
+                            pic: this.upload_data.url,
+                            isbn: this.dialog_goods.isbn
+                        }).then(resp=>{
+                            if(resp.data.code == '00000'){
+                                this.getData()
+                                console.log('upload image ok !');
+                            }
+                        })
+
                     }
 
                     this.pic = file.url
-
-                    console.log(file);
-                    console.log(fileList);
                 },
                 choosePicStatus() {
                     this.getData()
@@ -356,16 +355,12 @@ export default {
                     //数据备份
                     var modify_goods = this.tableData[index]
 
-                    console.log(modify_goods);
-
                     // 准备修改图片的参数
                     let key = 'book/' + modify_goods.isbn
                     getToken(key).then( res=> {
                         this.upload_data.key = key
                         this.upload_data.token = res.data.token
                         this.upload_data.url = res.data.url
-
-                        console.log(this.upload_data);
                     })
 
                     this.backup_data.id = modify_goods.id
