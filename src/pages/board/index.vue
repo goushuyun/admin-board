@@ -31,21 +31,26 @@
 }
 
 #content {
-    position: fixed;
-    top: 60px;
-    left: 180px;
-    right: 0;
-    bottom: 0;
-    background-color: white;
-    overflow: auto;
-    padding: 32px 16px;
+    padding-top: 60px;
+    padding-left: 180px;
+    min-height: 100%;
+    min-width: 100%;
+    overflow-x: hidden;
+    .content_inner{
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        overflow: auto;
+        padding: 32px 16px;
+    }
+    box-sizing: border-box;
 }
 
 </style>
 
 <template lang="html">
 
-<div>
+<div id="app">
     <div id="top_bar">
         <el-menu theme="dark" mode="horizontal" class="top_menu" :router="true">
             <el-submenu index="2">
@@ -96,7 +101,9 @@
     </div>
 
     <div id="content">
-        <router-view></router-view>
+        <div class="content_inner">
+            <router-view></router-view>
+        </div>
     </div>
 
 </div>
