@@ -1,4 +1,4 @@
-<style lang="scss">
+<style lang="scss" scoped>
 
 div.content {
     .btn_bottom {
@@ -18,8 +18,7 @@ div.content {
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        width: 112px;
-        height: 158px;
+
         padding: 2px;
         box-sizing: border-box;
         display: flex;
@@ -38,8 +37,8 @@ div.content {
         text-align: center;
     }
     .avatar {
-        width: 100%;
-        height: 100%;
+        width: 112px;
+        height: 158px;
         display: block;
     }
 }
@@ -122,7 +121,7 @@ div.content {
     </div>
 
     <!-- 修改提示框 -->
-    <el-dialog title="修改库存信息" v-model="boxVisible" size="small">
+    <el-dialog class="modify_goods" title="修改库存信息" v-model="boxVisible" size="small">
         <el-form :model="dialog_goods" label-width="80px">
             <el-form-item label="书名">
                 {{dialog_book.title}}

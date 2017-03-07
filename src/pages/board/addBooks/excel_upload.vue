@@ -50,7 +50,7 @@
 </style>
 
 <template lang="html">
-    <div class="">
+    <div class="content">
       <div class="upload_status">
         <el-row type="flex" justify="center" align="middle">
             <el-col :span="24">
@@ -145,6 +145,7 @@ export default {
                 /* DO SOMETHING WITH workbook HERE */
                 var sheet0 = workbook.SheetNames[0]
                 var data = XLSX.utils.sheet_to_csv(workbook.Sheets[sheet0]).split('\n')
+                // console.log(data);
                 var dataArray = []
                 data.forEach(function(da) {
                     if (da.length > 10) { //判断是否所有字段都为空？是的话只有10个逗号
@@ -172,7 +173,7 @@ export default {
                     if (arr.length > 11) {
                         arr.splice(11, 1)
                     }
-                    console.log(arr);
+                    // console.log(arr);
                     success.push(arr)
                 } else {
                     // 向错误数据末尾插入错误提示
@@ -291,16 +292,18 @@ export default {
         array2json(array) {
             var json = []
             //DO SOMETHING WITH array
+            let self = this
             array.forEach(function(arr) {
-                var store = ''
-                var shelf = ''
-                this.stores.forEach(function(store) {
+                var st = ''
+                var sh = ''
+                // console.log(self.stores);
+                self.stores.forEach(function(store) {
                     if (store.name == arr[9]) {
-                        store = store.id
+                        st = store.id
                         var shelves = store.shelves
                         shelves.forEach(function(shelf) {
-                            if (shelf.name == array[10]) {
-                                shelf = shelf.id
+                            if (shelf.name == arr[10]) {
+                                sh = shelf.id
                             }
                         })
                     }
@@ -310,14 +313,14 @@ export default {
                     title: arr[1],
                     publisher: arr[2],
                     author: arr[3],
-                    pre_price: (arr[4] * 100).toFixed(0),
+                    pre_price: parseInt(arr[4] * 100),
                     amount: Number(arr[5]),
-                    price: (arr[4] * arr[6] * 100).toFixed(0),
+                    price: parseInt(arr[4] * arr[6] * 100),
                     // discount: arr[6],
                     category: Number(arr[7]),
                     type: Number(arr[8]),
-                    store_id: store,
-                    shelf_id: shelf
+                    store_id: st,
+                    shelf_id: sh
                 }
                 json.push(obj)
             })
@@ -342,9 +345,9 @@ export default {
             var data = self.array2json(self.check_success)
             for (var i = 0, len = data.length; i < len; i += 500) {
                 if (i + 500 <= len) {
-                    var request_data = data.slice(i, i + 500)
+                    var request_data = {models: data.slice(i, i + 500)}
                 } else {
-                    var request_data = data.slice(i, len)
+                    var request_data = {models: data.slice(i, len)}
                 }
                 // console.log(request_data);
                 //DO SOMETHING WITH REQUEST
