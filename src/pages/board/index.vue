@@ -9,7 +9,7 @@
     top: 0;
     left: 180px;
     right: 0;
-    // z-index: 2;
+    z-index: 2;
     .top_menu>li {
         float: right;
     }
