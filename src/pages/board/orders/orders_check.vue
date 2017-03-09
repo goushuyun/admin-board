@@ -44,6 +44,11 @@ div.content {
     p.center {
         text-align: center;
     }
+
+    .pagination{
+        margin-top: 12px;
+    }
+
 }
 table.order_items:hover {
     background-color: #EFF2F7;
