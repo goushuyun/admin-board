@@ -6,7 +6,7 @@
     height: 100px;
     text-align: center;
 }
-#order_info {
+#order_info,#refund_info{
     font-size: 14px;
     line-height: 40px;
     border: 1px solid #DFE6EC;
@@ -23,6 +23,16 @@
         .first-lable {
             width: 90px;
             text-align: right;
+        }
+    }
+
+    .refund_img {
+        width: 80px;
+        height: 80px;
+        margin: 12px 12px 12px 0;
+        img {
+          width: 80px;
+          height: 80px;
         }
     }
 }
@@ -81,6 +91,12 @@
                     <el-step title="已关闭" :description="present_order.close_at==0?'':present_order.close_at"></el-step>
                 </el-steps>
             </el-col>
+            <!-- <el-col :span="24" v-if="present_order.order_status">
+                <el-steps :space="300" :active="2" finish-status="process" center align-center>
+                    <el-step title="买家下单" :description="present_order.order_at"></el-step>
+                    <el-step title="已关闭" :description="present_order.close_at==0?'':present_order.close_at"></el-step>
+                </el-steps>
+            </el-col> -->
         </el-row>
     </div>
 
@@ -115,10 +131,63 @@
                     <label class="first-lable">付款时间：</label><label>{{present_order.pay_at}}</label>
                 </div>
                 <div class="info_info" v-if="present_order.order_status==2">
-                    <label class="first-lable">操作：</label><label><el-button type="info" size="small"  @click="sendOrder(present_order.order_id)">发货</el-button></label>
+                    <label class="first-lable">操作：</label><label><el-button type="info" size="small"  @click="sendOrder(present_order.order_id)">发货</el-button><el-button type="info" size="small"  @click="">打印详情</el-button></label>
                 </div>
                 <div class="info_info" v-if="present_order.order_status==3">
                     <label class="first-lable">操作：</label><label><el-button type="danger" size="small"  @click="checkCompleteOrder(present_order.order_id)">交易完成</el-button></label>
+                </div>
+            </el-col>
+        </el-row>
+    </div>
+    <div id="refund_info">
+        <div class="info_title">售后详情</div>
+        <el-row :span="24">
+            <el-col :span="12">
+                <div class="info_info">
+                    <label class="first-lable">售后单号：</label><label>{{address_info.name}}</label>
+                </div>
+                <div class="info_info">
+                    <label class="first-lable">申请时间：</label><label>{{address_info.tel}}</label>
+                </div>
+                <div class="info_info">
+                    <label class="first-lable">申请金额：</label><label>{{address_info.address}}</label>
+                </div>
+                <div class="info_info">
+                    <label class="first-lable">实退金额：</label><label>{{address_info.address}}</label>
+                </div>
+                <div class="info_info">
+                    <label class="first-lable">申请理由：</label><label>{{present_order.remark}}</label>
+                </div>
+            </el-col>
+            <el-col :span="12">
+                <div class="info_info">
+                    <label class="first-lable">查看图片：</label>
+                    <el-card :body-style="{ padding: '0px' }" class="refund_img">
+                      <img src="http://okxy9gsls.bkt.clouddn.com/book.png">
+                    </el-card>
+                    <el-card :body-style="{ padding: '0px' }" class="refund_img">
+                      <img src="http://okxy9gsls.bkt.clouddn.com/book.png">
+                    </el-card>
+                    <el-card :body-style="{ padding: '0px' }" class="refund_img">
+                      <img src="http://okxy9gsls.bkt.clouddn.com/book.png">
+                    </el-card>
+                    <el-card :body-style="{ padding: '0px' }" class="refund_img">
+                      <img src="http://okxy9gsls.bkt.clouddn.com/book.png">
+                    </el-card>
+                </div>
+                <div class="info_info">
+                    <label class="first-lable">售后状态：</label><label>{{present_order.remark}}</label>
+                </div>
+                <div class="info_info">
+                  <label class="first-lable">退款金额：</label>
+                  <label><el-input placeholder="请输入退款金额" size="mini" icon="edit" v-model="refund_fee"></el-input></label>
+                </div>
+                <div class="info_info">
+                    <label class="first-lable">操作：</label>
+                    <label>
+                      <el-button type="danger" size="small" @click="">退款</el-button>
+                      <el-button type="danger" size="small" @click="">拒绝退款</el-button>
+                    </label>
                 </div>
             </el-col>
         </el-row>
@@ -168,7 +237,9 @@ export default {
             present_order: {},
             address_info: {},
 
-            order_status_description: ['', '待付款', '待发货', '已发货，待收货', '已完成','已关闭']
+            order_status_description: ['', '待付款', '待发货', '已发货，待收货', '已完成','已关闭'],
+
+            refund_fee: 0
         }
     },
     methods: {
