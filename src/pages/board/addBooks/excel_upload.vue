@@ -75,7 +75,7 @@
           <p>• 货架名：请使用完整的货架名</p>
         </div>
         <div class="img">
-          <img src="src/images/example.jpg">
+          <img src="../../../images/example.jpg">
         </div>
         <div class="btn">
           <el-checkbox v-model="select_checked">已仔细阅读以上内容</el-checkbox>

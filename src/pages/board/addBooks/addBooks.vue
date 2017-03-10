@@ -47,6 +47,7 @@ div.right {
 }
 .zindexarea {
   position: relative;
+  height: 326px;
 }
 .zindex0{
   position: absolute;
@@ -101,7 +102,7 @@ div.right {
 
 <div class="content" v-loading="loading" :element-loading-text="loading_text">
     <div class="left">
-      
+
         <div v-if="ruleForm.isbn">
           <el-upload class="avatar-uploader" action="http://upload.qiniu.com/" :data="requestData" :show-file-list="false" :on-success="handleAvatarScucess">
             <img v-if="ruleForm.pic" :src="ruleForm.pic" class="avatar">
@@ -299,7 +300,6 @@ export default {
                     trigger: 'blur'
                 }],
                 price: [{
-                    type: 'number',
                     required: true,
                     message: '请填写图书原价',
                     trigger: 'blur'

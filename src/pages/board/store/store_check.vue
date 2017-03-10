@@ -10,7 +10,6 @@ div.content {
     }
     .pagination {
         margin-top: 12px;
-        text-align: right;
     }
     .el-upload {
         border: 1px dashed #d9d9d9;
