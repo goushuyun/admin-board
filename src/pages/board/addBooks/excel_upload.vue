@@ -198,10 +198,13 @@ export default {
                 obj.success = false
                 obj.message = 'ISBN错误'
                 return obj
-            } else if (array[0].length != 10 && array[0].length != 13) {
-                obj.success = false
-                obj.message = 'ISBN错误'
-                return obj
+            } else {
+                var isbn = array[0].replace(new RegExp("-","gm"),"").trim()
+                if (isbn.length != 10 && isbn.length != 13) {
+                    obj.success = false
+                    obj.message = 'ISBN错误'
+                    return obj
+                }
             }
             if (!array[1]) {
                 obj.success = false
@@ -317,7 +320,7 @@ export default {
                     }
                 })
                 var obj = {
-                    isbn: arr[0],
+                    isbn: arr[0].replace(new RegExp("-","gm"),"").trim(),
                     title: arr[1],
                     publisher: arr[2],
                     author: arr[3],
