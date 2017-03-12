@@ -60,6 +60,20 @@ table.order_items:hover {
 .el-input {
     width: 400px;
 }
+#printDialog {
+    .printProgress {
+        text-align: center;
+    }
+    .printResult {
+        padding: 0px 40px 0 40px
+    }
+    .fail{
+        color:#FF4949;
+    }
+    .success{
+        color:#13CE66;
+    }
+}
 </style>
 
 <template lang="html">
@@ -117,7 +131,7 @@ table.order_items:hover {
             </el-col>
 
             <el-col :span="8">
-                <el-button v-if="order_status==2" type="primary" size="small" @click="sendSelectedOrders">批量打印并发货</el-button>
+                <el-button v-if="order_status==2" type="primary" size="small" @click="printAndAcceptOrders">批量打印并发货</el-button>
                 <el-button v-if="order_status==2" type="primary" size="small" :plain="true" @click="sendSelectedOrders">批量发货</el-button>
                 <el-button v-if="order_status==3" type="success" size="small" @click="completeSelectedOrder">批量完成</el-button>
             </el-col>
@@ -215,6 +229,38 @@ table.order_items:hover {
         </el-table-column>
     </el-table>
 
+    <el-dialog id="printDialog" title="正在批量打印并发货，请耐心等待......" v-model="printDialog" :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
+      <div class="printProgress">
+        <el-progress v-if="print_percentage!=100" type="circle" :percentage="print_percentage"></el-progress>
+        <el-progress v-else type="circle" :percentage="100" status="success"></el-progress>
+      </div>
+      <el-alert
+        style="width:60%;margin:30px auto;"
+        title="请确保当前打印机无其他打印任务！"
+        type="warning"
+        :closable="false">
+      </el-alert>
+      <div class="printResult">
+        <el-collapse v-model="activeNames">
+          <el-collapse-item v-if="printFailData.length" name="fail">
+            <template slot="title">
+              <span class="fail">{{printFailData.length}} 条订单打印失败！ <i class="header-icon el-icon-information"></i></span>
+            </template>
+            <p v-for="(data, index) in printFailData">{{(index + 1) + '. ' + data.title + data.content}}</p>
+          </el-collapse-item>
+          <el-collapse-item v-if="printSuccessData.length">
+            <template slot="title">
+              <span class="success">{{printSuccessData.length}} 条订单打印成功！ <i class="header-icon el-icon-circle-check"></i></span>
+            </template>
+            <p v-for="(data, index) in printSuccessData">{{(index + 1) + '. ' + data.title + data.content}}</p>
+          </el-collapse-item>
+        </el-collapse>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="recoverSelf" :disabled="disabledButton">确 定</el-button>
+      </span>
+    </el-dialog>
     <div class="pagination">
         <el-pagination :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange">
         </el-pagination>
@@ -226,6 +272,7 @@ table.order_items:hover {
 <script>
 import enumList from '../../../scripts/enum'
 import axios from "../../../scripts/http"
+
 export default {
     mounted() {
         this.getData()
@@ -246,7 +293,12 @@ export default {
             selected_orders: [],
 
             loading: false,
-
+            print_percentage: 0,
+            printDialog: false,
+            activeNames: ['fail'],
+            printSuccessData: [],
+            printFailData: [],
+            disabledButton: true,
             pickerOptions2: {
                 shortcuts: [{
                     text: '最近一周',
@@ -358,6 +410,90 @@ export default {
                     });
                 });
             }
+        },
+        printAndAcceptOrders() {
+            var self = this
+
+            var selectedOrders =  self.selected_orders
+            if (selectedOrders.length < 1) {
+                self.$message({
+                    message: '您未选中任何订单!',
+                    type: 'warning'
+                })
+                self.loading = false
+                return
+            } else {
+                this.$confirm('您将批量打印并发货, 是否继续?', '提示', {
+                    confirmButtonText: '打印并发货',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.printDialog = true
+                    var printRecords = new Array();
+                    var recoresSize = 0;
+                    localStorage.printRecords = JSON.stringify(printRecords);
+                    self.printData = selectedOrders
+                    localStorage.printOver = false;
+                    localStorage.totalSize = selectedOrders.length;
+                    var unit = 100/selectedOrders.length
+                    orderPromiseFunc(selectedOrders);
+                    var checkPrintOver = setInterval(function() {
+                        var records = JSON.parse(localStorage.printRecords);
+                        if (recoresSize != records.length) {
+                            for (var i = recoresSize; i < records.length; i++) {
+                                var record = records[i]
+                                if (record.success) {
+                                    self.printSuccessData.push(record)
+                                    /* 发货 */
+                                    self.sendOrder(localStorage.successOrderNo)
+                                } else {
+                                    self.printFailData.push(record)
+                                }
+                                var percentage = self.print_percentage + unit
+                                if (percentage <= 100) {
+                                  self.print_percentage = percentage
+                                }else {
+                                  self.print_percentage = 100
+                                }
+                                self.$notify({
+                                    title: record.title,
+                                    message: record.content,
+                                    type: record.success ? 'success' : 'error',
+                                    duration: record.success ? 5000 : 0
+                                });
+                            }
+                            recoresSize = records.length
+                        }
+                        if (localStorage.printOver && localStorage.totalSize <= 0) {
+                            self.disabledButton = false
+                            clearTimeout(checkPrintOver);
+                            console.log("打印结束")
+                        }
+                    }, 500)
+                }).catch(() => {
+                    this.loading = false
+                    this.$message({
+                        type: 'info',
+                        message: '已取消操作!'
+                    });
+                });
+            }
+        },
+        recoverSelf() {
+            this.disabledButton = true
+            this.printSuccessData = []
+            this.printFailData = []
+        },
+        sendOrder(order_id){
+            axios.post('/v1/orders/send_orders', {order_ids: [order_id]}).then(resp => {
+                if(resp.data.code == '00000') {
+                    //发货成功
+                    this.$message({
+                        message: '订单 '+ order_id +' 已发货',
+                        type: 'success'
+                    })
+                }
+            })
         },
         sendSelectedOrders() {
             this.loading = true
