@@ -37,7 +37,7 @@
     min-width: 100%;
     overflow-x: hidden;
     .content_inner{
-        width: 100%;
+        // width: 100%;
         height: 100%;
         background-color: white;
         overflow: auto;

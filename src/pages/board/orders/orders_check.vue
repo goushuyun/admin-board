@@ -110,16 +110,8 @@ table.order_items:hover {
             </el-form-item>
         </el-form>
 
-        <el-form :inline="true">
-            <el-form-item>
-                <!-- 导出发货单 -->
-                <el-button size="small" icon="document">筛选并导出发货单</el-button>
-                <el-button size="small" icon="document">筛选并导出报订单</el-button>
-            </el-form-item>
-        </el-form>
-
         <el-row style="padding-bottom: 12px;">
-            <el-col :span="16">
+            <el-col :span="12">
                 <el-radio-group v-model="order_status" size="small" @change="orderStatusChangeHandle">
                     <el-radio-button :label="2">待发货</el-radio-button>
                     <el-radio-button :label="3">已发货</el-radio-button>
@@ -130,10 +122,12 @@ table.order_items:hover {
                 </el-radio-group>
             </el-col>
 
-            <el-col :span="8">
+            <el-col :span="12">
+                <el-button v-if="order_status==2" size="small" icon="document" @click="searchAndExportAcceptOrder">筛选并导出发货单</el-button>
+                <el-button v-if="order_status==2" size="small" icon="document">筛选并导出报订单</el-button>
                 <el-button v-if="order_status==2" type="primary" size="small" @click="printAndAcceptOrders">批量打印并发货</el-button>
                 <el-button v-if="order_status==2" type="primary" size="small" :plain="true" @click="sendSelectedOrders">批量发货</el-button>
-                <el-button v-if="order_status==3" type="success" size="small" @click="completeSelectedOrder">批量完成</el-button>
+                <el-button v-if="order_status==3" type="primary" size="small" icon="star-off" @click="completeSelectedOrder">批量完成</el-button>
             </el-col>
 
         </el-row>
@@ -147,13 +141,13 @@ table.order_items:hover {
                 <p>{{scope.row.order_id}}</p>
                 <template v-if="scope.row.after_sale_status > 0">
                     <el-tag type="danger" v-if="scope.row.after_sale_status == 1">待处理</el-tag>
-                    <el-tag type="success" v-if="scope.row.after_sale_status == 2">已处理</el-tag>
+                    <el-tag type="gray" v-if="scope.row.after_sale_status == 2">已处理</el-tag>
                 </template>
                 <template v-else>
                     <el-tag type="warning" v-if="scope.row.order_status == 2">待发货</el-tag>
                     <el-tag type="primary" v-if="scope.row.order_status == 3">已发货</el-tag>
                     <el-tag type="success" v-if="scope.row.order_status == 4">已完成</el-tag>
-                    <el-tag type="gray" v-if="scope.row.order_status == 5">已关闭</el-tag>
+                    <el-tag v-if="scope.row.order_status == 5">已关闭</el-tag>
                 </template>
             </template>
         </el-table-column>
@@ -329,6 +323,47 @@ export default {
         }
     },
     methods: {
+        searchAndExportAcceptOrder() {
+            var self = this
+            if (self.order_time == '') {
+                self.$message({
+                    message: '请选择时间区间！',
+                    type: 'warning'
+                })
+                return
+            }
+            // var result = this.getData()
+            var params = {
+                order_at_start: moment(self.order_time[0], "YYYY-MM-DD HH:mm:ss").unix(),
+                order_at_end: moment(self.order_time[1], "YYYY-MM-DD HH:mm:ss").unix(),
+                order_status: 2
+            }
+            if (self.searchType != "") {
+                params[self.searchType] = self.searchValue
+            }
+            self.loading = true
+            axios.post('/v1/orders/listAllOrders', params).then(resp => {
+                if (resp.data.code == '00000') {
+                    var total = resp.data.total
+                }
+                self.loading = false
+                self.$confirm('搜索出' + total + '条结果，是否继续？','提示',{
+                    confirmButtonText: '导出发货单',
+                    cancelButtonText: '取消',
+                    type: total ? 'warning' : 'info'
+                }).then(() => {
+                    var adminInfo = JSON.parse(localStorage.adminInfo)
+                    params.shop_id = adminInfo.shop_id,
+                    console.log('http://admin.goushuyun.com/v1/orders/export_invoices?params=' + JSON.stringify(params));
+                    window.location.assign('http://admin.goushuyun.com/v1/orders/export_invoices?params=' + JSON.stringify(params))
+                }).catch(() => {
+                    self.$message({
+                        message: '已取消操作！',
+                        type: 'info'
+                    })
+                })
+            })
+        },
         orderStatusChangeHandle(status) {
             // 设置请求时的订单状态 or 售后状态
             if (status < 5) {
