@@ -101,7 +101,7 @@ div.right {
 
 <div class="content" v-loading="loading" :element-loading-text="loading_text">
     <div class="left">
-      
+
         <div v-if="ruleForm.isbn">
           <el-upload class="avatar-uploader" action="http://upload.qiniu.com/" :data="requestData" :show-file-list="false" :on-success="handleAvatarScucess">
             <img v-if="ruleForm.pic" :src="ruleForm.pic" class="avatar">
@@ -231,9 +231,7 @@ div.right {
 </div>
 
 </template>
-
 <script>
-
 import {isISBNFormat} from "../../../scripts/utils"
 import axios from "../../../scripts/http"
 import uploadImage from "../../../scripts/uploadImage"
