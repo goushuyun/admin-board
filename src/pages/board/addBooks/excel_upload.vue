@@ -1,132 +1,390 @@
 <style lang="scss" scoped>
 .box-card {
-    width: 600px;
-    margin-left: 15px;
-    .excel_upload {
-        margin: 20px;
-    }
-    .error {
-        margin: 40px 0;
-    }
-    .prompt {
-        margin-top: 20px;
-        color: #8391A5;
-        p {
-            font-size: 12px;
-        }
-    }
-}
-
-div p {
-    // height: 40px;
-    line-height: 40px;
-    margin-left: 10px;
-    font-size: 14px;
+    margin: 10px;
+    height: 600px;
+    position: relative;
     span {
+        line-height: 14px;
         font-weight: bold;
     }
-    a {
-        margin: 0 10px;
+    strong {
+        color: red;
+        font-size: 20px;
+        margin-left: 20px;
+    }
+    p {
+        margin: 10px;
+        line-height: 14px;
+        font-size: 14px;
+    }
+    .img {
+        margin: 10px;
+        padding: 10px;
+        img {
+            border: 1px solid;
+        }
+    }
+    .btn {
+        margin: 10px;
+        display: flex;
+        align-items: center;
+        position: absolute;
+        bottom: 10px;
+        .el-button {
+            margin: 0 10px;
+        }
+    }
+    .progress {
+        padding: 80px;
+        width: auto;
+        text-align: center;
     }
 }
 
-.dialog-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    color: red;
-    img {
-        width: 40px;
-        height: 40px;
-        margin-right: 5px;
-    }
-}
-.warning_pic{
-    width: auto;
+#grid {
     margin: 10px;
-    img {
-      width: 100%;
-      border: 1px solid;
-    }
-}
-.footer {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    .el-button {
-        margin: 10px;
-    }
+    height: 400px;
+    margin: 0 auto;
+    overflow: auto;
 }
 </style>
 
 <template lang="html">
-  <div>
-    <div class="box-card">
-      <div class="example">
-          <p>如果您还没有下载样例文件，请点击<a href="https://www.baidu.com">下载样例文件</a>，并编辑好商品信息后上传。</p>
+    <div class="content">
+      <div class="upload_status">
+        <el-row type="flex" justify="center" align="middle">
+            <el-col :span="24">
+                <el-steps :space="200" :active="upload_status" finish-status="success" center align-center>
+                    <el-step title="选择文件"></el-step>
+                    <el-step title="校验数据"></el-step>
+                    <el-step title="上传数据"></el-step>
+                </el-steps>
+            </el-col>
+        </el-row>
       </div>
-      <div class="excel_upload">
-          <el-button size="small" type="primary" @click="showDialog">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传xlsx文件，且不超过500kb</div>
-      </div>
-      <div class="error">
-        <p><span>文件有误：</span><a href="https://www.baidu.com">xxxxxxx.xls</a>请点击下载此文件，按照要求修改后重新上传。</p>
-      </div>
+      <el-card v-if="upload_status==1" class="box-card">
+        <div slot="header" class="clearfix"><span>选择文件</span></div>
+        <div class="text">
+          <p>• <a href="https://www.baidu.com">下载样例文件</a></p>
+          <p>• 只能上传xlsx和xls文件，且不超过2M</p>
+          <p>• 出版社：请使用完整的出版社名称</p>
+          <p>• 类&nbsp;&nbsp;&nbsp;别：1.教材  2.教辅  3.外语  4.阅读  5.考证</p>
+          <p>• 类&nbsp;&nbsp;&nbsp;型：1.新书  2.旧书</p>
+          <p>• 折&nbsp;&nbsp;&nbsp;扣：0.7表示7折 ，请保持折扣值在0~1之间</p>
+          <p>• 仓库名：请使用完整的仓库名</p>
+          <p>• 货架名：请使用完整的货架名</p>
+        </div>
+        <div class="img">
+          <img src="../../../images/example.jpg">
+        </div>
+        <div class="btn">
+          <el-checkbox v-model="select_checked">已仔细阅读以上内容</el-checkbox>
+          <el-button type="primary" v-show="!select_checked" :disabled="true">选取文件</el-button>
+          <el-upload action="" :before-upload="handleFile" :show-upload-list="false" clearFiles>
+            <el-button slot="trigger" type="primary" v-show="select_checked">选取文件</el-button>
+          </el-upload>
+        </div>
+      </el-card>
 
-      <div class="prompt">
-         <p>上传须知：</p>
-         <p>出版社：请使用完整的出版社名称</p>
-         <p>类别：1.教材 2.教辅 3.外语 4.阅读 5.考证</p>
-         <p>类型：1.新书 2.旧书</p>
-         <p>仓库名、货架名：请使用完整的仓库名、货架名</p>
-      </div>
+      <el-card v-if="upload_status==2" v-loading="check_loading" class="box-card">
+        <div slot="header" class="clearfix"><span>校验结果</span><strong>{{'（'+check_success.length+'条数据校验成功；'+(check_fail.length)+'条数据校验失败！）'}}</strong></div>
+        <div class="" v-show="check_fail.length>0">
+          <el-alert title="以下为校验失败的数据，您可以参考每行末尾的“错误提示”直接在当前页面进行修改并“重新校验”，也可以选择放弃下方的错误数据“直接上传”。" type="error" show-icon></el-alert>
+        </div>
+        <div id="grid" class="hot handsontable htRowHeaders htColumnHeaders" data-originalstyle="height: 320px; overflow: hidden; width: 584px;"></div>
+        <div class="btn">
+          <el-button type="primary" v-show="check_fail.length>0" @click="checkAgain">重新校验</el-button>
+          <el-button type="primary" v-show="check_fail.length==0" @click="upload">确认上传</el-button>
+          <el-button type="warning" v-show="check_fail.length>0" @click="partUpload">直接上传</el-button>
+        </div>
+      </el-card>
+
+      <el-card v-if="upload_status==3" class="box-card">
+        <div slot="header" class="clearfix"><span>上传成功</span><strong>{{'（'+check_success.length+'条数据上传成功；'+(check_fail.length)+'条数据上传失败！）'}}</strong></div>
+        <div class="progress">
+          <el-progress v-if="upload_percentage!=100" type="circle" :width="240" :percentage="upload_percentage"></el-progress>
+          <el-progress v-else type="circle" :width="240" :percentage="100" status="success"></el-progress>
+        </div>
+        <div class="btn">
+          <el-button type="success" @click="complete">完成</el-button>
+        </div>
+      </el-card>
     </div>
-
-    <el-dialog :show-close="false" :close-on-press-escape="false" :close-on-click-modal="false" v-model="dialogVisible">
-      <div class="dialog-title">
-          <img src="src/images/warning.png"/><span>警告</span>
-      </div>
-      <div>
-          <p>· 请务必确保上传内容正确，否则会造成无法挽回的损失！</p>
-          <p>· 折扣示例：0.7表示7折 ，请保持折扣值在0~1之间！</p>
-          <p>· 请确保书名、出版社、作者等信息下方的信息是对应的。避免出现将书名填写在出版社下方的情况！</p>
-          <p>· 请使用完整的出版社名称以及仓库、货架名！</p>
-          <p>· 数据一旦上传将无法撤回，造成的一切后果请自行承担！</p>
-      </div>
-      <div class="warning_pic">
-          <img src="src/images/upload_warning.jpg">
-      </div>
-      <div class="dialog-footer footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-upload class="upload-demo" action="/v1/file/upload_books_excel" :on-preview="handlePreview" :on-success="handleSuccess" :on-error="handleError">
-          <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-        </el-upload>
-      </div>
-    </el-dialog>
-  </div>
 </template>
 
 <script>
+import axios from "../../../scripts/http"
 export default {
     data() {
         return {
-            dialogVisible: false
-        }
+            stores: [],
+            check_loading: false,
+            upload_status: 1,
+            select_checked: false,
+            upload_percentage: 0,
+            check_success: [],
+            check_fail: [],
+            hot: {}
+        };
+    },
+    mounted() {
+        axios.post('/v1/store/listStores', {}).then(resp => {
+            this.stores = resp.data.data
+        })
     },
     methods: {
-      handleSuccess(response, file, fileList) {
-        console.log('success!');
-      },
-      handleError(err, file, fileList) {
-        console.log('error!');
-      },
-      handlePreview(file) {
-        console.log(file);
-      },
-      showDialog(){
-        this.dialogVisible = true
-      }
+        handleFile(file) {
+            var self = this
+            var reader = new FileReader();
+            var name = file.name;
+            reader.onload = function(e) {
+                var data = e.target.result;
+                var workbook = XLSX.read(data, {
+                    type: 'binary'
+                });
+                /* DO SOMETHING WITH workbook HERE */
+                var sheet0 = workbook.SheetNames[0]
+                var dataJson = XLSX.utils.sheet_to_json(workbook.Sheets[sheet0])
+                var json2array = []
+                dataJson.forEach(function(d) {
+                    var item = []
+                    item.push(d['ISBN'])
+                    item.push(d['书名'])
+                    item.push(d['出版社'])
+                    item.push(d['作者'])
+                    item.push(d['原价'])
+                    item.push(d['数量'])
+                    item.push(d['折扣'])
+                    item.push(d['类别'])
+                    item.push(d['新旧'])
+                    item.push(d['仓库名'])
+                    item.push(d['货架名'])
+                    json2array.push(item)
+                })
+                self.checkData(json2array)
+            };
+            reader.readAsBinaryString(file);
+            self.upload_status = 2
+        },
+        checkData(array) {
+            var self = this
+            var success = self.check_success
+            var fail = []
+            array.forEach(function(arr) {
+                var obj = self.checkItem(arr)
+                // 删除再次校验的时候插入的提示信息
+                if (arr.length > 11) {
+                    arr.splice(11, 1)
+                }
+                if (obj.success) {
+                    success.push(arr)
+                } else {
+                    // 向错误数据末尾插入错误提示
+                    arr.push(obj.message)
+                    fail.push(arr)
+                }
+            })
+            self.check_success = success
+            self.check_fail = fail
+
+            $('#grid').empty()
+            if (self.check_fail.length > 0) {
+                self.makeContainer(self.check_fail)
+            }
+        },
+        checkItem(array) {
+            var obj = {}
+            if (!array[0]) {
+                obj.success = false
+                obj.message = 'ISBN错误'
+                return obj
+            } else {
+                var isbn = array[0].replace(new RegExp("-","gm"),"").trim()
+                if (isbn.length != 10 && isbn.length != 13) {
+                    obj.success = false
+                    obj.message = 'ISBN错误'
+                    return obj
+                }
+            }
+            if (!array[1]) {
+                obj.success = false
+                obj.message = '书名错误'
+                return obj
+            }
+            if (!array[2]) {
+                obj.success = false
+                obj.message = '出版社错误'
+                return obj
+            }
+            if (!array[3]) {
+                obj.success = false
+                obj.message = '作者错误'
+                return obj
+            }
+            if (!(Number(array[4]) > 0)) {
+                obj.success = false
+                obj.message = '原价错误'
+                return obj
+            }
+            if (!(parseFloat(array[5]) == parseInt(array[5]))) {
+                obj.success = false
+                obj.message = '数量错误'
+                return obj
+            }
+            if (!(parseFloat(array[6]) > 0 && parseFloat(array[6]) <= 1)) {
+                obj.success = false
+                obj.message = '折扣错误'
+                return obj
+            }
+            if (['1', '2', '3', '4', '5'].indexOf(array[7]) == -1) {
+                obj.success = false
+                obj.message = '类别错误'
+                return obj
+            }
+            if (['1', '2'].indexOf(array[8]) == -1) {
+                obj.success = false
+                obj.message = '新旧错误'
+                return obj
+            }
+            var exist_store = false
+            var exist_shelf = false
+            this.stores.forEach(function(store) {
+                if (store.name == array[9]) {
+                    exist_store = true
+                    var shelves = store.shelves
+                    shelves.forEach(function(shelf) {
+                        if (shelf.name == array[10]) {
+                            exist_shelf = true
+                        }
+                    })
+                }
+            })
+            if (!exist_store) {
+                obj.success = false
+                obj.message = '仓库名错误'
+                return obj
+            }
+            if (!exist_shelf) {
+                obj.success = false
+                obj.message = '货架名错误'
+                return obj
+            }
+            obj.success = true
+            obj.message = '没有错误'
+            return obj
+        },
+        checkAgain() {
+            var self = this
+            self.check_loading = true
+            var hot_data = self.hot.getData()
+            hot_data.splice(0, 1)
+            self.checkData(hot_data)
+            setTimeout(function() {
+                self.check_loading = false
+            }, 500)
+        },
+        makeContainer(array) {
+            var show_data = []
+            show_data = array
+            show_data.unshift(['ISBN', '书名', '出版社', '作者', '原价', '数量', '折扣', '类别', '新旧', '仓库名', '货架名', '错误提示'])
+            var container = document.getElementById('grid');
+            var hot = new Handsontable(container, {
+                data: show_data,
+                fixedRowsTop: 1,
+                rowHeaders: true,
+                colHeaders: true,
+                manualColumnResize: true,
+                manualRowResize: true,
+                stretchH: 'all',
+                contextMenu: true
+            });
+            this.hot = hot
+        },
+        array2json(array) {
+            var json = []
+            //DO SOMETHING WITH array
+            let self = this
+            array.forEach(function(arr) {
+                var st = ''
+                var sh = ''
+                // console.log(self.stores);
+                self.stores.forEach(function(store) {
+                    if (store.name == arr[9]) {
+                        st = store.id
+                        var shelves = store.shelves
+                        shelves.forEach(function(shelf) {
+                            if (shelf.name == arr[10]) {
+                                sh = shelf.id
+                            }
+                        })
+                    }
+                })
+                var obj = {
+                    isbn: arr[0].replace(new RegExp("-","gm"),"").trim(),
+                    title: arr[1],
+                    publisher: arr[2],
+                    author: arr[3],
+                    pre_price: parseInt(arr[4] * 100),
+                    amount: Number(arr[5]),
+                    price: parseInt(arr[4] * arr[6] * 100),
+                    // discount: arr[6],
+                    category: Number(arr[7]),
+                    type: Number(arr[8]),
+                    store_id: st,
+                    shelf_id: sh
+                }
+                json.push(obj)
+            })
+            return json
+        },
+        partUpload() {
+            var self = this
+            self.$confirm('此操作将放弃校验失败的数据, 直接上传校验成功的数据，是否继续?', '提示', {
+                confirmButtonText: '继续上传',
+                cancelButtonText: '返回修改',
+                type: 'warning'
+            }).then(() => {
+                self.upload()
+            }).catch(() => {
+                return
+            });
+        },
+        upload() {
+            $('#grid').empty()
+            var self = this
+            self.upload_status = 3
+            var data = self.array2json(self.check_success)
+            for (var i = 0, len = data.length; i < len; i += 500) {
+                if (i + 500 <= len) {
+                    var request_data = {
+                        models: data.slice(i, i + 500)
+                    }
+                } else {
+                    var request_data = {
+                        models: data.slice(i, len)
+                    }
+                }
+                console.log(request_data);
+                //DO SOMETHING WITH REQUEST
+                axios.post('/v1/books/upload_goods_by_excel', request_data)
+                    .then(resp => {
+                        if (request_data.length == 500) {
+                            self.upload_percentage += parseInt(500 / len)
+                        } else {
+                            self.upload_percentage = 100
+                        }
+                    })
+            }
+
+        },
+        complete() {
+            this.upload_status = 1
+            this.select_checked = false
+            this.upload_percentage = 0
+            this.check_success = []
+            this.check_fail = []
+            this.hot = {}
+        }
     }
 }
 </script>

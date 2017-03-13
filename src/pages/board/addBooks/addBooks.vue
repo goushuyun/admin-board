@@ -47,6 +47,7 @@ div.right {
 }
 .zindexarea {
   position: relative;
+  height: 326px;
 }
 .zindex0{
   position: absolute;
@@ -297,7 +298,6 @@ export default {
                     trigger: 'blur'
                 }],
                 price: [{
-                    type: 'number',
                     required: true,
                     message: '请填写图书原价',
                     trigger: 'blur'
