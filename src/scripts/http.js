@@ -27,13 +27,18 @@ axios.interceptors.response.use(function(response) {
         localStorage.setItem('token', jwt_token)
     }
     //relogin
+    if(response.data.code == '11001'){
+        app.$message.error('用户名或密码错误!')
+        // return new Error(response.data.message)
+    }
+    //relogin
     if(response.data.code == '11014'){
         window.location.href = "http://www.goushuyun.com/#"
     }
     //handler error
     if(response.data.code != '00000'){
         app.$message.error(response.data.message)
-        return new Error(response.data.message)
+        // return new Error(response.data.message)
     }
     return response;
 }, function(error) {

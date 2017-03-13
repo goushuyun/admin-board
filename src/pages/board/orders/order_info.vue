@@ -164,7 +164,7 @@
                 <div class="info_info">
                     <label class="first-lable">查看图片：</label>
                     <el-card :body-style="{ padding: '0px' }" class="refund_img" v-for="img in after_sale_info.images">
-                      <img :src="img" @click="picturePreview(img)">
+                      <img :src="img" @click="picturePreview(img)" style="cursor:pointer;">
                     </el-card>
                     <el-dialog v-model="dialog.visible" size="tiny">
                       <img width="100%" :src="dialog.url" alt="">

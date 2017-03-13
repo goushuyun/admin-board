@@ -33,7 +33,7 @@ div#loginBox{
     <div class="container">
         <div id="loginBox">
             <img class="logo" src="../../images/logo.jpg" alt="">
-            <el-input v-model="tel" placeholder="手机号码" autofocus></el-input>
+            <el-input class="loginTel" v-model="tel" placeholder="手机号码" autofocus></el-input>
             <el-input @keyup.enter.native="login" v-model="password" type="password" placeholder="密码"></el-input>
             <el-button class="login_btn" :loading="btn_loading" type="primary" @click="login">登录</el-button>
         </div>
@@ -86,6 +86,9 @@ export default {
                 }else if (resp.data.code == '11001'){
                     //user not found
                     this.$message.error("用户名或密码错误")
+                    this.tel = ''
+                    this.password = ''
+                    $('.loginTel input').focus()
                 }
                 this.btn_loading = false
             })
