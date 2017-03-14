@@ -167,7 +167,6 @@ a {
 </template>
 
 <script>
-var echarts = require('echarts');
 //默认销售统计类型
 var salesSatisticsRecord = "bookType";
 //全局变量，用于绘制折线图
