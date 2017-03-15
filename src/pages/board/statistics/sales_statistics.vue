@@ -386,7 +386,7 @@ export default {
                     stack: '总量',
                     areaStyle: {
                         normal: {
-                            color: '6f7d88'
+                            color: '#d06e6b'
                         }
                     },
                     data: [150, 232, 201, 154, 190, 330, 410]
@@ -397,7 +397,7 @@ export default {
                 stack: '总量',
                 areaStyle: {
                     normal: {
-                        color: '#e1a894'
+                        color: '#6a7984'
                     }
                 },
                 data: [320, 332, 301, 334, 390, 330, 320]
