@@ -322,7 +322,7 @@ function structPrintJSON(order) {
         if (order.items[i].type == 2) bookType = "旧书";
 
         book.type = bookType
-        book.shelf = "货架位";
+        book.shelf = "货架位:" + order.items[i].shelf_name + "-" + order.items[i].store_name;
         books.push(book);
     }
 
@@ -356,8 +356,13 @@ function Records(title, success, content) {
 }
 
 function getDate() {
-
-    return "2017/7/12 12:40"
+    var oDate = new Date(); //实例一个时间对象；
+    oDate.getFullYear(); //获取系统的年；
+    oDate.getMonth() + 1; //获取系统月份，由于月份是从0开始计算，所以要加1
+    oDate.getDate(); // 获取系统日，
+    oDate.getHours(); //获取系统时，
+    oDate.getMinutes(); //分
+    return oDate.getFullYear() + "/" + oDate.getMonth() + 1 + "/" + oDate.getDate() + " " + oDate.getHours() + ":" + oDate.getMinutes()
 }
 
 function orderPromiseFunc(serverData) {
@@ -392,7 +397,7 @@ function orderPromiseFunc(serverData) {
         var content = "共" + singleOrderPrintModel.totalPage + "页，全部打印完成！"
         var record = new Records(title, true, content);
         //post请求
-        localStorage.successOrderNo =  singleOrderPrintModel.orderNo;
+        localStorage.successOrderNo = singleOrderPrintModel.orderNo;
         pushRecord(record)
 
         orderPromiseFunc(value);
@@ -436,3 +441,24 @@ function pushRecord(record) {
     records.push(record);
     localStorage.printRecords = JSON.stringify(records);
 }
+
+/* 检查是否安装了打印插件 */
+function CheckIsInstall() {
+    try {
+        var LODOP = getLodop();
+        if (LODOP.VERSION) {
+            return true;
+        };
+    } catch (err) {
+        return false;
+    }
+};
+
+/* 测试能否正常打印 */
+function testPrint() {
+    LODOP = getLodop();
+    LODOP.PRINT_INIT("测试打印页面");
+    LODOP.SET_PRINT_STYLE("FontSize", 18);
+    LODOP.SET_PRINT_STYLE("Bold", 1);
+    LODOP.PRINTA();
+};
