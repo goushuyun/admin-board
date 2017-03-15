@@ -322,7 +322,7 @@ function structPrintJSON(order) {
         if (order.items[i].type == 2) bookType = "旧书";
 
         book.type = bookType
-        book.shelf = "货架位";
+        book.shelf = "货架位:"+order.items[i].shelf_name+"-"+order.items[i].store_name;
         books.push(book);
     }
 
