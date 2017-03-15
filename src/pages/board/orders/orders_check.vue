@@ -472,6 +472,22 @@ export default {
         },
         printAndAcceptOrders() {
             var self = this
+            console.log(CheckIsInstall());
+            if (!CheckIsInstall()) {
+                self.$confirm('您尚未安装打印插件，请先安装！','提示',{
+                    confirmButtonText: '确认安装',
+                    cancelButtonText: '取消',
+                    type: 'info'
+                }).then(() => {
+                    window.location.assign('http://okxy9gsls.bkt.clouddn.com/CLodop_Setup_for_Win32NT.exe')
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消操作!'
+                    });
+                });
+                return
+            }
 
             var selectedOrders =  self.selected_orders
             if (selectedOrders.length < 1) {
@@ -539,9 +555,10 @@ export default {
             }
         },
         recoverSelf() {
-            this.disabledButton = true
+            this.printDialog = false
             this.printSuccessData = []
             this.printFailData = []
+            this.disabledButton = true
         },
         sendOrder(order_id){
             axios.post('/v1/orders/send_orders', {order_ids: [order_id]}).then(resp => {
