@@ -232,9 +232,7 @@ div.right {
 </div>
 
 </template>
-
 <script>
-
 import {isISBNFormat} from "../../../scripts/utils"
 import axios from "../../../scripts/http"
 import uploadImage from "../../../scripts/uploadImage"
