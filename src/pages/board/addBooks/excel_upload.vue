@@ -65,7 +65,7 @@
       <el-card v-if="upload_status==1" class="box-card">
         <div slot="header" class="clearfix"><span>选择文件</span></div>
         <div class="text">
-          <p>• <a href="https://www.baidu.com">下载样例文件</a></p>
+          <p>• <a href="http://okxy9gsls.bkt.clouddn.com/uploadExcel.xlsx">下载样例文件</a></p>
           <p>• 只能上传xlsx和xls文件，且不超过2M</p>
           <p>• 出版社：请使用完整的出版社名称</p>
           <p>• 类&nbsp;&nbsp;&nbsp;别：1.教材  2.教辅  3.外语  4.阅读  5.考证</p>

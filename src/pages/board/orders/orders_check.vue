@@ -124,7 +124,7 @@ table.order_items:hover {
 
             <el-col :span="12">
                 <el-button v-if="order_status==2" size="small" icon="document" @click="searchAndExportAcceptOrder">筛选并导出发货单</el-button>
-                <el-button v-if="order_status==2" size="small" icon="document">筛选并导出报订单</el-button>
+                <el-button v-if="order_status==2" size="small" icon="document" @click="searchAndExportReportOrder">筛选并导出报订单</el-button>
                 <el-button v-if="order_status==2" type="primary" size="small" @click="printAndAcceptOrders">批量打印并发货</el-button>
                 <el-button v-if="order_status==2" type="primary" size="small" :plain="true" @click="sendSelectedOrders">批量发货</el-button>
                 <el-button v-if="order_status==3" type="primary" size="small" icon="star-off" @click="completeSelectedOrder">批量完成</el-button>
@@ -325,18 +325,12 @@ export default {
     methods: {
         searchAndExportAcceptOrder() {
             var self = this
-            if (self.order_time == '') {
-                self.$message({
-                    message: '请选择时间区间！',
-                    type: 'warning'
-                })
-                return
-            }
-            // var result = this.getData()
             var params = {
-                order_at_start: moment(self.order_time[0], "YYYY-MM-DD HH:mm:ss").unix(),
-                order_at_end: moment(self.order_time[1], "YYYY-MM-DD HH:mm:ss").unix(),
                 order_status: 2
+            }
+            if (self.order_time != '') {
+                params.order_at_start = moment(self.order_time[0], "YYYY-MM-DD HH:mm:ss").unix()
+                params.order_at_end = moment(self.order_time[1], "YYYY-MM-DD HH:mm:ss").unix()
             }
             if (self.searchType != "") {
                 params[self.searchType] = self.searchValue
@@ -354,8 +348,38 @@ export default {
                 }).then(() => {
                     var adminInfo = JSON.parse(localStorage.adminInfo)
                     params.shop_id = adminInfo.shop_id,
-                    console.log('http://admin.goushuyun.com/v1/orders/export_invoices?params=' + JSON.stringify(params));
                     window.location.assign('http://admin.goushuyun.com/v1/orders/export_invoices?params=' + JSON.stringify(params))
+                }).catch(() => {
+                    self.$message({
+                        message: '已取消操作！',
+                        type: 'info'
+                    })
+                })
+            })
+        },
+        searchAndExportReportOrder() {
+            var self = this
+            var params = {
+                order_status: 2
+            }
+            if (self.order_time != '') {
+                params.order_at_start = moment(self.order_time[0], "YYYY-MM-DD HH:mm:ss").unix()
+                params.order_at_end = moment(self.order_time[1], "YYYY-MM-DD HH:mm:ss").unix()
+            }
+            self.loading = true
+            axios.post('/v1/orders/listAllOrders', params).then(resp => {
+                if (resp.data.code == '00000') {
+                    var total = resp.data.total
+                }
+                self.loading = false
+                self.$confirm('搜索出' + total + '条结果，是否继续？','提示',{
+                    confirmButtonText: '导出报订单',
+                    cancelButtonText: '取消',
+                    type: total ? 'warning' : 'info'
+                }).then(() => {
+                    var adminInfo = JSON.parse(localStorage.adminInfo)
+                    params.shop_id = adminInfo.shop_id,
+                    window.location.assign('http://admin.goushuyun.com/v1/orders/export_orders_for_publisher?params=' + JSON.stringify(params))
                 }).catch(() => {
                     self.$message({
                         message: '已取消操作！',
@@ -448,6 +472,22 @@ export default {
         },
         printAndAcceptOrders() {
             var self = this
+            console.log(CheckIsInstall());
+            if (!CheckIsInstall()) {
+                self.$confirm('您尚未安装打印插件，请先安装！','提示',{
+                    confirmButtonText: '确认安装',
+                    cancelButtonText: '取消',
+                    type: 'info'
+                }).then(() => {
+                    window.location.assign('http://okxy9gsls.bkt.clouddn.com/CLodop_Setup_for_Win32NT.exe')
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消操作!'
+                    });
+                });
+                return
+            }
 
             var selectedOrders =  self.selected_orders
             if (selectedOrders.length < 1) {
@@ -515,9 +555,10 @@ export default {
             }
         },
         recoverSelf() {
-            this.disabledButton = true
+            this.printDialog = false
             this.printSuccessData = []
             this.printFailData = []
+            this.disabledButton = true
         },
         sendOrder(order_id){
             axios.post('/v1/orders/send_orders', {order_ids: [order_id]}).then(resp => {
