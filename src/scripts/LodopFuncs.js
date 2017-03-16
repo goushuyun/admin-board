@@ -70,19 +70,20 @@ function getLodop(oOBJECT, oEMBED) {
                 LODOP = getCLodop();
             } catch (err) {};
             if (!LODOP && document.readyState !== "complete") {
-                return fasle;
+                alert("C-Lodop没准备好，请稍后再试！");
+                return;
             };
             if (!LODOP) {
                 if (isIE) document.write(strCLodopInstall);
                 else
-                  return false;
+                    document.documentElement.innerHTML = strCLodopInstall + document.documentElement.innerHTML;
                 return;
             } else {
 
                 if (CLODOP.CVERSION < "2.0.9.4") {
                     if (isIE) document.write(strCLodopUpdate);
                     else
-                        return false;
+                        document.documentElement.innerHTML = strCLodopUpdate + document.documentElement.innerHTML;
                 };
                 if (oEMBED && oEMBED.parentNode) oEMBED.parentNode.removeChild(oEMBED);
                 if (oOBJECT && oOBJECT.parentNode) oOBJECT.parentNode.removeChild(oOBJECT);
@@ -106,26 +107,26 @@ function getLodop(oOBJECT, oEMBED) {
             //=====Lodop插件未安装时提示下载地址:==========
             if ((LODOP == null) || (typeof(LODOP.VERSION) == "undefined")) {
                 if (navigator.userAgent.indexOf('Chrome') >= 0)
-                    return false;
+                    document.documentElement.innerHTML = strHtmChrome + document.documentElement.innerHTML;
                 if (navigator.userAgent.indexOf('Firefox') >= 0)
-                    return false;
+                    document.documentElement.innerHTML = strHtmFireFox + document.documentElement.innerHTML;
                 if (is64IE) document.write(strHtm64_Install);
                 else
                 if (isIE) document.write(strHtmInstall);
                 else
-                    return false;
+                    document.documentElement.innerHTML = strHtmInstall + document.documentElement.innerHTML;
                 return LODOP;
             };
         };
         if (LODOP.VERSION < "6.2.1.7") {
             if (needCLodop())
-                return false;
+                document.documentElement.innerHTML = strCLodopUpdate + document.documentElement.innerHTML;
             else
             if (is64IE) document.write(strHtm64_Update);
             else
             if (isIE) document.write(strHtmUpdate);
             else
-                return false;
+                document.documentElement.innerHTML = strHtmUpdate + document.documentElement.innerHTML;
             return LODOP;
         };
         //===如下空白位置适合调用统一功能(如注册语句、语言选择等):===

@@ -64,7 +64,6 @@
     margin-top: 3%;
     margin-right: 2%;
     display: inline-block;
-    cursor: pointer;
     span {
         color: red;
     }
@@ -128,9 +127,9 @@ a {
     <el-card class="order-card" style="margin-top:15px;padding:2% 1%" v-loading="ordersLoading" element-loading-text="拼命加载中">
       <h1 style="font-size:20px;">待处理订单</h1>
       <div class="orderAlert">
-        <router-link :to="{ name: 'orders_check', params: { order_status:2 }}"><p class="penddingOrders" >待发货 <span v-text="penddingOrders"></span></p></router-link>
-        <router-link :to="{ name: 'orders_check', params: { order_status:3 }}"><p class="acceptOrders">已发货 <span v-text="acceptOrders"></span></p></router-link>
-        <router-link :to="{ name: 'orders_check', params: { order_status:6 }}"><p class="afterSales">售 后 <span v-text="afterSales"></span></p></router-link>
+        <p class="penddingOrders">待发货 <span v-text="penddingOrders"></span></p>
+        <p class="acceptOrders">已发货 <span v-text="acceptOrders"></span></p>
+        <p class="afterSales">售 后 <span v-text="afterSales"></span></p>
       </div>
     </el-card>
 
@@ -177,6 +176,7 @@ var salesSatisticsRecord = "bookType";
 var myChart;
 
 import axios from "../../../scripts/http"
+
 // 基于准备好的dom，初始化echarts实例
 export default {
 
@@ -194,7 +194,6 @@ export default {
                 this.structChartData(this.salesData,salesSatisticsRecord);
             }
         },
-
         salesDateChange:function(value){
           this.salesLoading = true;
           var dateArr = value.split("/");
@@ -305,7 +304,7 @@ export default {
       axios.post("/v1/statistic/get_recent_turnover",{}).then(resp => {
         if(resp.data.code== undefined || resp.data.code != "00000") {
             this.statisticLoading = false;
-
+            console.log("============");
             return;
         }
 
@@ -337,13 +336,6 @@ export default {
         this.salesData = resp.data.data;
         this.structChartData(this.salesData,salesSatisticsRecord);
       })
-
-      //监听窗口
-      window.onresize = () => {
-               return (() => {
-                 this.reloadCharts();
-               })()
-           }
     },
 
     data() {
@@ -429,8 +421,7 @@ export default {
                     }
                 },
                 data: [820, 932, 901, 934, 1290, 1330, 1320]
-            },
-             screenWidth: document.body.clientWidth
+            }
         }
 
     }
