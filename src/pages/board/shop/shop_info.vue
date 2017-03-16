@@ -88,6 +88,14 @@ export default {
     methods: {
         handleAvatarScucess(res, file) {
             this.form.logo = URL.createObjectURL(file.raw);
+            this.form.id = this.shop_id
+            // update shop logo
+            this.form.logo = 'http://image.cumpusbox.com/shop/' + this.shop_id
+            axios.post('/v1/admin/update_shop_logo', this.form).then(resp=>{
+                if(resp.data.code == '00000'){
+
+                }
+            })
         },
         submit(){
             if (this.disabled){
@@ -95,7 +103,7 @@ export default {
             }else{
                 console.log(this.form)
                 //上传修改后的商家信息
-                this.form.logo = 'http://ojrfwndal.bkt.clouddn.com/shop/' + this.shop_id
+                this.form.logo = 'http://image.cumpusbox.com/shop/' + this.shop_id
                 this.form.id = this.shop_id
                 let self = this
                 axios.post('/v1/admin/updateShopInfo', this.form).then(resp=>{
@@ -122,10 +130,11 @@ export default {
             zone: 1,
             key: 'shop/' + this.shop_id
         }).then(resp => {
+            console.log(resp);
+
+
             this.requestData.key = 'shop/' + this.shop_id
             this.requestData.token = resp.data.data.token
-
-            console.log(this.token)
         })
     },
 

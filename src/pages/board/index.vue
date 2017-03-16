@@ -99,12 +99,6 @@
                 <el-menu-item index="/admin/offline_retail">线下零售</el-menu-item>
                 <el-menu-item index="/admin/retail_order">线下订单</el-menu-item>
             </el-submenu>
-            <el-submenu index="6">
-                <template slot="title">
-                    <i class="el-icon-menu"></i>数据统计
-                </template>
-                <el-menu-item index="/admin/sales_statistics">数据统计</el-menu-item>
-            </el-submenu>
         </el-menu>
     </div>
 
