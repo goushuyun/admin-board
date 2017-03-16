@@ -431,7 +431,7 @@ export default {
             })
         },
         completeSelectedOrder() {
-            this.loading = true
+
             var order_ids = this.selected_orders.map(el => {
                 return el.order_id
             })
@@ -449,6 +449,7 @@ export default {
                     type: 'warning'
                 }).then(() => {
                     console.log(order_ids)
+                    this.loading = true
                     axios.post('/v1/orders/complete_orders', {
                         order_ids: order_ids
                     }).then(resp => {
