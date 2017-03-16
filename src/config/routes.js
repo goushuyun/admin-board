@@ -50,5 +50,9 @@ export default [{
         name: 'excel_upload',
         path: 'excel_upload',
         component: require('../pages/board/addBooks/excel_upload')
+    },{
+        name: 'sales_statistics',
+        path: 'sales_statistics',
+        component: require('../pages/board/statistics/sales_statistics')
     }]
 }]
