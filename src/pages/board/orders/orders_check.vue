@@ -270,6 +270,8 @@ import axios from "../../../scripts/http"
 export default {
     mounted() {
         this.getData()
+        //接收上一级页面的参数
+        if(this.$route.params.order_status!=undefined) this.order_status = this.$route.params.order_status;
     },
     data() {
         return {
@@ -431,7 +433,7 @@ export default {
             })
         },
         completeSelectedOrder() {
-            this.loading = true
+
             var order_ids = this.selected_orders.map(el => {
                 return el.order_id
             })
@@ -449,6 +451,7 @@ export default {
                     type: 'warning'
                 }).then(() => {
                     console.log(order_ids)
+                    this.loading = true
                     axios.post('/v1/orders/complete_orders', {
                         order_ids: order_ids
                     }).then(resp => {
@@ -556,6 +559,7 @@ export default {
         },
         recoverSelf() {
             this.printDialog = false
+            this.print_percentage = 0
             this.printSuccessData = []
             this.printFailData = []
             this.disabledButton = true

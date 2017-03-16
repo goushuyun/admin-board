@@ -210,6 +210,12 @@ export default {
                 obj.success = false
                 obj.message = '书名错误'
                 return obj
+            } else {
+                if (array[1].trim().length >30) {
+                    obj.success = false
+                    obj.message = '书名错误'
+                    return obj
+                }
             }
             if (!array[2]) {
                 obj.success = false
