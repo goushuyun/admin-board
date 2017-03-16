@@ -557,6 +557,7 @@ export default {
         },
         recoverSelf() {
             this.printDialog = false
+            this.print_percentage = 0
             this.printSuccessData = []
             this.printFailData = []
             this.disabledButton = true
