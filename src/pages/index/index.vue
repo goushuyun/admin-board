@@ -82,7 +82,7 @@ export default {
                     //put adminInfo into admin
                     localStorage.setItem('adminInfo', JSON.stringify(resp.data.data))
 
-                    this.$router.push({name: 'admin'})
+                    this.$router.push({name: 'sales_statistics'})
                 }else if (resp.data.code == '11001'){
                     //user not found
                     this.$message.error("用户名或密码错误")
