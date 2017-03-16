@@ -132,10 +132,10 @@
                 </div> -->
                 <div class="info_info" v-if="present_order.order_status==2 && present_order.after_sale_status == 0">
                     <label class="first-lable">操作：</label><label><el-button type="info" size="small"  @click="sendOrder(present_order.order_id)">发货</el-button></label>
-                    <label style="margin-left:10px;"><el-button type="info" size="small"  @click="">打印详情</el-button></label>
+                    <!-- <label style="margin-left:10px;"><el-button type="info" size="small"  @click="">打印详情</el-button></label> -->
                 </div>
                 <div class="info_info" v-if="present_order.order_status==3 && present_order.after_sale_status == 0">
-                    <label class="first-lable">操作：</label><label><el-button type="danger" size="small"  @click="checkCompleteOrder(present_order.order_id)">交易完成</el-button></label>
+                    <label class="first-lable">操作：</label><label><el-button type="success" size="small"  @click="checkCompleteOrder(present_order.order_id)">交易完成</el-button></label>
                 </div>
             </el-col>
         </el-row>
@@ -332,7 +332,7 @@ export default {
           this.dialog.visible = true;
         },
         checkCompleteOrder(order_id) {
-          this.$confirm('您将关闭订单, 是否继续?', '提示', {
+          this.$confirm('您将完成订单, 是否继续?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'

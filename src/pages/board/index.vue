@@ -54,7 +54,9 @@
     <div id="top_bar">
         <el-menu theme="dark" mode="horizontal" class="top_menu" :router="true">
             <el-submenu index="2">
-                <template slot="title">{{adminName}}</template>
+                  <template slot="title" style="cursor:printer">
+                      {{adminName}}
+                    </template>
                 <el-menu-item index="/admin/shop_info">店铺信息</el-menu-item>
                 <el-menu-item index="/">退出</el-menu-item>
             </el-submenu>
@@ -62,7 +64,7 @@
     </div>
 
     <div id="left_bar">
-        <h3 class="title">{{shopName}}</h3>
+        <h3 class="title" @click="mainPage">{{shopName}}</h3>
         <el-menu theme="dark" mode="vertical" :router="true">
             <el-submenu index="1">
                 <template slot="title">
@@ -97,12 +99,6 @@
                 <el-menu-item index="/admin/offline_retail">线下零售</el-menu-item>
                 <el-menu-item index="/admin/retail_order">线下订单</el-menu-item>
             </el-submenu>
-            <el-submenu index="6">
-                <template slot="title">
-                    <i class="el-icon-menu"></i>数据统计
-                </template>
-                <el-menu-item index="/admin/sales_statistics">数据统计</el-menu-item>
-            </el-submenu>
         </el-menu>
     </div>
 
@@ -136,6 +132,11 @@ export default {
                 this.shopName = adminInfo.shop.shop_name
                 this.adminName = adminInfo.admin_name
             }
+        },
+        methods:{
+          mainPage:function(){
+            this.$router.push("sales_statistics")
+          }
         }
 }
 

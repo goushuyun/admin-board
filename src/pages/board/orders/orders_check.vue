@@ -125,8 +125,8 @@ table.order_items:hover {
             <el-col :span="12">
                 <el-button v-if="order_status==2" size="small" icon="document" @click="searchAndExportAcceptOrder">筛选并导出发货单</el-button>
                 <el-button v-if="order_status==2" size="small" icon="document" @click="searchAndExportReportOrder">筛选并导出报订单</el-button>
-                <el-button v-if="order_status==2" type="primary" size="small" @click="printAndAcceptOrders">批量打印并发货</el-button>
-                <el-button v-if="order_status==2" type="primary" size="small" :plain="true" @click="sendSelectedOrders">批量发货</el-button>
+                <el-button v-if="order_status==2" type="primary" size="small" icon="star-off" @click="printAndAcceptOrders">批量打印并发货</el-button>
+                <el-button v-if="order_status==2" type="primary" size="small" icon="star-off" :plain="true" @click="sendSelectedOrders">批量发货</el-button>
                 <el-button v-if="order_status==3" type="primary" size="small" icon="star-off" @click="completeSelectedOrder">批量完成</el-button>
             </el-col>
 
