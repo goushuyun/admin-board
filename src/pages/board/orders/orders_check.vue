@@ -269,9 +269,10 @@ import axios from "../../../scripts/http"
 
 export default {
     mounted() {
+        if(this.$route.params.order_status!=undefined) this.order_status = this.$route.params.order_status;
         this.getData()
         //接收上一级页面的参数
-        if(this.$route.params.order_status!=undefined) this.order_status = this.$route.params.order_status;
+
     },
     data() {
         return {
