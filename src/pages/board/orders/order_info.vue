@@ -261,12 +261,17 @@ export default {
                     if (resp.data.message == 'ok') {
                         self.$message({
                             type: 'success',
-                            message: '操作成功!'
+                            message: '操作成功'
                         });
-                    } else {
+                    } else if (resp.data.message == 'NOTENOUGH') {
+                        self.$message({
+                            type: 'warning',
+                            message: '余额不足'
+                        });
+                    }else {
                         self.$message({
                             type: 'error',
-                            message: '退款失败!'
+                            message: '退款失败'
                         });
                     }
                     self.loadingOrder(self.present_order.order_id)
@@ -286,7 +291,7 @@ export default {
                     if (resp.data.code == '00000') {
                         self.$message({
                             type: 'success',
-                            message: '操作成功!'
+                            message: '操作成功'
                         });
                         self.loadingOrder(self.present_order.order_id)
                     }
@@ -295,7 +300,7 @@ export default {
             .catch(() => {
                 this.$message({
                     type: 'info',
-                    message: '已取消操作！'
+                    message: '已取消操作'
                 });
             });
         },
@@ -314,7 +319,7 @@ export default {
             }
             if (input_num > max_value) {
                 this.$message({
-                    message: '退款金额超过了订单总额，已重置为订单总额！',
+                    message: '退款金额超过了订单总额，已重置为订单总额',
                     type: 'warning'
                 });
                 this.actual_refund_fee = (max_value / 100).toFixed(2)
@@ -336,7 +341,7 @@ export default {
           }).catch(() => {
             this.$message({
               type: 'info',
-              message: '已取消操作!'
+              message: '已取消操作'
             });
           });
         },

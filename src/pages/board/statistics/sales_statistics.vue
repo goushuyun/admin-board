@@ -6,14 +6,15 @@
     width: 100%;
 }
 .card {
+    margin:auto;
     height: 150px;
-    width: 33%;
-    border: 1px soild red;
+    width: 32%;
     display: inline-block;
 }
 
 .today {
     background-color: #e9a084;
+    margin-left: 1.5%;
 }
 .yestday {
     // margin-left: -1%;
@@ -21,21 +22,22 @@
 }
 .total {
     background-color: #009999;
+
 }
 .money:before {
     content: "¥ ";
 }
 .title {
     font-size: 20px;
-    margin-top: 5%;
-    text-align: center;
     color: white;
+    text-align: center;
+    margin-top:50px;
 }
 .money {
     font-size: 20px;
-    margin-top: 5%;
-    text-align: center;
     color: white;
+    margin-top:5px;
+    text-align: center;
 }
 .detailSales {
     font-size: 15px;
@@ -45,10 +47,12 @@
     margin-right: 10px;
 }
 .newBook {
-    margin-top: 15px;
+
+  margin-top: 20px;
+
 }
 .oldBook {
-    margin-top: 5px;
+  margin-top: 3px;
 }
 .newBook:before {
     content: "新书 ¥:";
@@ -57,7 +61,6 @@
     content: "旧书 ¥:";
 }
 .orderAlert p {
-    width: 7%;
     margin-top: 3%;
     margin-right: 2%;
     display: inline-block;
@@ -133,7 +136,7 @@ a {
     <el-card class="order-card" style="margin-top:15px;padding:2% 1%"  v-loading="salesLoading" element-loading-text="拼命加载中">
       <el-dropdown style="font-size:20px;" trigger="click" @command="salesSatistics">
         <div class="">
-          <span class="el-dropdown-link" style="color:black;">
+          <span class="el-dropdown-link" style="color:black;cursor:pointer" >
             <span class="bookSalesStatictis">新旧图书销售统计</span> <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown" style="font-size:15px;">
@@ -385,7 +388,7 @@ export default {
                     stack: '总量',
                     areaStyle: {
                         normal: {
-                            color: '6f7d88'
+                            color: '#d06e6b'
                         }
                     },
                     data: [150, 232, 201, 154, 190, 330, 410]
@@ -396,7 +399,7 @@ export default {
                 stack: '总量',
                 areaStyle: {
                     normal: {
-                        color: '#e1a894'
+                        color: '#6a7984'
                     }
                 },
                 data: [320, 332, 301, 334, 390, 330, 320]
