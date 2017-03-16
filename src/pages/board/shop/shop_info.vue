@@ -83,15 +83,20 @@ div#container {
 <script>
 import axios from "../../../scripts/http"
 import uploadImage from "../../../scripts/uploadImage"
+import {getTimeVal} from "../../../scripts/utils"
+
 export default {
     mixins: [uploadImage],
     methods: {
         handleAvatarScucess(res, file) {
-            this.form.logo = URL.createObjectURL(file.raw);
-            this.form.id = this.shop_id
-            // update shop logo
-            this.form.logo = 'http://image.cumpusbox.com/shop/' + this.shop_id
-            axios.post('/v1/admin/update_shop_logo', this.form).then(resp=>{
+            this.form.logo = file.url
+
+            let data = {
+                id: this.shop_id,
+                logo: 'http://image.cumpusbox.com/shop/' + this.shop_id
+            }
+
+            axios.post('/v1/admin/update_shop_logo', data).then(resp=>{
                 if(resp.data.code == '00000'){
 
                 }
@@ -124,7 +129,7 @@ export default {
         this.form.shop_name = adminInfo.shop.shop_name
         this.form.address = adminInfo.shop.address
         this.form.introduction = adminInfo.shop.introduction
-        this.form.logo = adminInfo.shop.logo
+        this.form.logo = adminInfo.shop.logo + '?' + getTimeVal()
         //获取token
         axios.post('/v1/mediastore/getUpToken', {
             zone: 1,

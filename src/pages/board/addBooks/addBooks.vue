@@ -140,7 +140,7 @@ div.right {
                 </el-input>
             </el-form-item>
             <el-form-item label="书名" prop="title">
-                <el-input v-model.trim="ruleForm.title"></el-input>
+                <el-input v-model.trim="ruleForm.title" :maxlength="30"></el-input>
             </el-form-item>
             <el-form-item label="出版社" prop="publisher">
                 <el-input v-model.trim="ruleForm.publisher"></el-input>
