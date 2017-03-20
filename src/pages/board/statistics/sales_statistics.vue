@@ -96,9 +96,7 @@ a {
     }
 }
 #echartsMap {
-    width: 100%;
     height: 500px;
-    margin-left: -1%;
     padding-top: 5%;
 }
 </style>
@@ -159,7 +157,7 @@ a {
           </el-date-picker>
       </div>
 
-      <div id="echartsMap" >
+      <div id="echartsMap" @resize="reloadCharts">
 
       </div>
 
@@ -259,7 +257,12 @@ export default {
           }
         },
         reloadCharts(){
-          myChart = echarts.init(document.getElementById("echartsMap"));
+          var $echarts = document.getElementById("echartsMap");
+
+          if($echarts==null){
+            return;
+          }
+          myChart = echarts.init($echarts);
           // 绘制图表
           myChart.setOption({
               tooltip: {
@@ -285,7 +288,7 @@ export default {
               },
               xAxis: [{
                   type: 'category',
-                  boundaryGap: false,
+                  boundaryGap: true,
                   data: this.chartShowDate
               }],
               yAxis: [{
@@ -336,11 +339,17 @@ export default {
         this.salesData = resp.data.data;
         this.structChartData(this.salesData,salesSatisticsRecord);
       })
-      window.onresize = () => {
-              return (() => {
-                this.reloadCharts();
-             })()
-          }
+var self = this;
+$(window).resize(function(e){
+  console.log(111);
+     self.reloadCharts();
+// do something when #unicorns element resizes
+});
+    // document.getElementById("echartsMap").onresize = () => {
+    //           return (() => {
+    //             this.reloadCharts();
+    //          })()
+    //       }
     },
 
     data() {
