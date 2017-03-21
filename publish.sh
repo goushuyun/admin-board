@@ -19,11 +19,5 @@ cp -r ./src/images  ./index.html ./build
 # copy 打包后的js
 cp ./dist/* ./build/dist
 
-# copy 打印相关js到 dist
-cp ./src/scripts/print.js ./src/scripts/LodopFuncs.js ./build/dist
-
-
-
 # rm -rf ./dist
-
 rsync -e ssh -r ./build/* --progress -cv 'root@115.28.109.6:/home/admin-pages'
