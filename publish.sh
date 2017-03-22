@@ -20,4 +20,5 @@ cp -r ./src/images  ./index.html ./build
 cp ./dist/* ./build/dist
 
 # rm -rf ./dist
+
 rsync -e ssh -r ./build/* --progress -cv 'root@115.28.109.6:/home/admin-pages'

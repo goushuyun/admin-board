@@ -147,7 +147,7 @@ a {
       <div class="block" style="float:right;">
           <el-date-picker
             v-model="salesDate"
-            type="datetimerange"
+            type="daterange"
             :picker-options="selectDates"
             placeholder="选择时间范围"
             @change="salesDateChange"
@@ -229,7 +229,6 @@ export default {
             this.chartLastData.name ="总销售额"
             this.chartLastData.data = lastArray;
             this.chartShowCategory = ['线上销售额', '线下销售额', '总销售额'];
-            console.log(this.chartFirstData);
             this.reloadCharts();
 
           }else{
@@ -307,12 +306,11 @@ export default {
       axios.post("/v1/statistic/get_recent_turnover",{}).then(resp => {
         if(resp.data.code== undefined || resp.data.code != "00000") {
             this.statisticLoading = false;
-            console.log("============");
             return;
         }
 
         this.nowdaySales = resp.data.data.today_total_turnover/100;
-        this.yesterdaySales = resp.data.data.yesterday_total_turnover;
+        this.yesterdaySales = resp.data.data.yesterday_total_turnover/100;
         var adminInfo = JSON.parse(localStorage.adminInfo);
         this.totalSales = (adminInfo.shop.offline_total_turnover+adminInfo.shop.online_total_turnover)/100;
         this.newbookSales = adminInfo.shop.new_book_total_turnover/100;
@@ -341,15 +339,9 @@ export default {
       })
 var self = this;
 $(window).resize(function(e){
-  console.log(111);
      self.reloadCharts();
 // do something when #unicorns element resizes
 });
-    // document.getElementById("echartsMap").onresize = () => {
-    //           return (() => {
-    //             this.reloadCharts();
-    //          })()
-    //       }
     },
 
     data() {
