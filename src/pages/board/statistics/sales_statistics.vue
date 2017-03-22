@@ -96,9 +96,7 @@ a {
     }
 }
 #echartsMap {
-    width: 100%;
     height: 500px;
-    margin-left: -1%;
     padding-top: 5%;
 }
 </style>
@@ -149,7 +147,7 @@ a {
       <div class="block" style="float:right;">
           <el-date-picker
             v-model="salesDate"
-            type="datetimerange"
+            type="daterange"
             :picker-options="selectDates"
             placeholder="选择时间范围"
             @change="salesDateChange"
@@ -159,7 +157,7 @@ a {
           </el-date-picker>
       </div>
 
-      <div id="echartsMap" >
+      <div id="echartsMap" @resize="reloadCharts">
 
       </div>
 
@@ -231,7 +229,6 @@ export default {
             this.chartLastData.name ="总销售额"
             this.chartLastData.data = lastArray;
             this.chartShowCategory = ['线上销售额', '线下销售额', '总销售额'];
-            console.log(this.chartFirstData);
             this.reloadCharts();
 
           }else{
@@ -259,7 +256,12 @@ export default {
           }
         },
         reloadCharts(){
-          myChart = echarts.init(document.getElementById("echartsMap"));
+          var $echarts = document.getElementById("echartsMap");
+
+          if($echarts==null){
+            return;
+          }
+          myChart = echarts.init($echarts);
           // 绘制图表
           myChart.setOption({
               tooltip: {
@@ -285,7 +287,7 @@ export default {
               },
               xAxis: [{
                   type: 'category',
-                  boundaryGap: false,
+                  boundaryGap: true,
                   data: this.chartShowDate
               }],
               yAxis: [{
@@ -304,12 +306,11 @@ export default {
       axios.post("/v1/statistic/get_recent_turnover",{}).then(resp => {
         if(resp.data.code== undefined || resp.data.code != "00000") {
             this.statisticLoading = false;
-            console.log("============");
             return;
         }
 
         this.nowdaySales = resp.data.data.today_total_turnover/100;
-        this.yesterdaySales = resp.data.data.yesterday_total_turnover;
+        this.yesterdaySales = resp.data.data.yesterday_total_turnover/100;
         var adminInfo = JSON.parse(localStorage.adminInfo);
         this.totalSales = (adminInfo.shop.offline_total_turnover+adminInfo.shop.online_total_turnover)/100;
         this.newbookSales = adminInfo.shop.new_book_total_turnover/100;
@@ -336,11 +337,11 @@ export default {
         this.salesData = resp.data.data;
         this.structChartData(this.salesData,salesSatisticsRecord);
       })
-      window.onresize = () => {
-              return (() => {
-                this.reloadCharts();
-             })()
-          }
+var self = this;
+$(window).resize(function(e){
+     self.reloadCharts();
+// do something when #unicorns element resizes
+});
     },
 
     data() {

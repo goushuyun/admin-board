@@ -298,6 +298,7 @@ export default {
                     trigger: 'blur'
                 }],
                 price: [{
+                    type: 'number',
                     required: true,
                     message: '请填写图书原价',
                     trigger: 'blur'
@@ -389,7 +390,7 @@ export default {
                 this.$refs[formName].resetFields();
             },
             pullIOnSale(ruleForm) {
-
+                console.log(ruleForm);
 
                 //校验必填字段
                 this.$refs[ruleForm].validate((valid) => {

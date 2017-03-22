@@ -77,7 +77,10 @@
 <div id="body">
     <div id="order_status">
         <el-row type="flex" justify="center" align="middle">
-            <el-col :span="24" v-if="present_order.order_status<5 && present_order.after_sale_status == 0">
+            <el-col :span="1">
+              <el-button icon="arrow-left" type="text" size="samll" @click="mainPage">返回上一页</el-button>
+            </el-col>
+            <el-col :span="23" v-if="present_order.order_status<5 && present_order.after_sale_status == 0">
                 <el-steps :space="200" :active="present_order.order_status" finish-status="success" center align-center>
                     <el-step title="买家下单" :description="present_order.order_at==0?'':present_order.order_at"></el-step>
                     <el-step title="买家付款" :description="present_order.pay_at==0?'':present_order.pay_at"></el-step>
@@ -244,6 +247,9 @@ export default {
         }
     },
     methods: {
+        mainPage:function(){
+          this.$router.go(-1)
+        },
         refund() {
             if (!this.checkActualRefundFee()) {
                 return

@@ -64,7 +64,7 @@
     </div>
 
     <div id="left_bar">
-        <h3 class="title" @click="mainPage">{{shopName}}</h3>
+        <h3 class="title" @click="mainPage" style="cursor:pointer">{{shopName}}</h3>
         <el-menu theme="dark" mode="vertical" :router="true">
             <el-submenu index="1">
                 <template slot="title">
