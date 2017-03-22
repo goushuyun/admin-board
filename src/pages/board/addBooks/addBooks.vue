@@ -390,8 +390,6 @@ export default {
                 this.$refs[formName].resetFields();
             },
             pullIOnSale(ruleForm) {
-                console.log(ruleForm);
-
                 //校验必填字段
                 this.$refs[ruleForm].validate((valid) => {
                     if (valid) {
@@ -536,7 +534,7 @@ export default {
                     this.ruleForm.title = book.title
                     this.ruleForm.publisher = book.publisher
                     this.ruleForm.pic = book.pic
-                    this.ruleForm.price = (book.price_int / 100).toFixed(2)
+                    this.ruleForm.price = parseFloat((book.price_int / 100).toFixed(2))
                     this.ruleForm.author = book.author
 
                     this.loading = false
