@@ -228,7 +228,7 @@ export default {
                 var items = []
                 for (var i = 0; i < this.books.length; i++) {
                     total_amount += this.books[i].number
-                    total_price += (this.books[i].number * this.books[i].selling_price).toFixed(2)
+                    total_price += this.books[i].number * this.books[i].selling_price
                     var item = {
                         goods_id: this.books[i].id,
                         number: this.books[i].number,
