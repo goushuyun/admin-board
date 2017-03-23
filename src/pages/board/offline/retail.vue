@@ -228,12 +228,12 @@ export default {
                 var items = []
                 for (var i = 0; i < this.books.length; i++) {
                     total_amount += this.books[i].number
-                    total_price += this.books[i].number * this.books[i].selling_price
+                    total_price += (this.books[i].number * this.books[i].selling_price).toFixed(2)
                     var item = {
                         goods_id: this.books[i].id,
                         number: this.books[i].number,
                         book_title: this.books[i].title,
-                        book_price: this.books[i].selling_price * 100,
+                        book_price: parseInt(this.books[i].selling_price * 100),
                         isbn: this.books[i].isbn,
                         type: this.books[i].type
                     }
@@ -241,7 +241,7 @@ export default {
                 }
 
                 axios.post('/v1/orders/offline_sale', {
-                    total_price: parseFloat(total_price)*100, //required   总价 单位分
+                    total_price: parseInt(total_price * 100), //required   总价 单位分
                     total_amount: total_amount, //required   总数量
                     sales_channel: 2, //销售渠道 2 => 线下零售
                     items: items
