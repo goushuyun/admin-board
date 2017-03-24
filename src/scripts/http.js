@@ -33,7 +33,7 @@ axios.interceptors.response.use(function(response) {
     }
     //relogin
     if(response.data.code == '11014'){
-        window.location.href = "http://www.goushuyun.com/#"
+        window.location.href = "http://www.cumpusbox.com/#"
     }
     //handler error
     if(response.data.code != '00000'){

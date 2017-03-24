@@ -126,7 +126,7 @@ div.content {
                 {{dialog_book.title}}
             </el-form-item>
             <el-form-item label="图片">
-                <el-upload class="avatar-uploader" action="http://upload.qiniu.com/" :data="upload_data" :show-upload-list="false" :on-success="uploadSuccess">
+                <el-upload class="avatar-uploader" action="http://upload.qiniu.com/" :data="upload_data" :show-file-list="false" :on-success="uploadSuccess">
                     <img v-if="pic" :src="pic" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
@@ -271,23 +271,16 @@ export default {
 
                 },
                 uploadSuccess(resp, file, fileList) {
-                    //获取dialog_goods  的isbn
-
-                    if (this.pic == '') {
-                        //之前没有图片，对book做插入图片操作
-                        console.log(resp.key);
-
-                        axios.post('/v1/books/set_book_pic_by_isbn', {
-                            pic: this.upload_data.url,
-                            isbn: this.dialog_goods.isbn
-                        }).then(resp=>{
-                            if(resp.data.code == '00000'){
-                                this.getData()
-                                console.log('upload image ok !');
-                            }
-                        })
-
-                    }
+                    //之前没有图片，对book做插入图片操作
+                    axios.post('/v1/books/set_book_pic_by_isbn', {
+                        pic: this.upload_data.url,
+                        isbn: this.dialog_goods.isbn
+                    }).then(resp=>{
+                        if(resp.data.code == '00000'){
+                            this.getData()
+                            console.log('upload image ok !');
+                        }
+                    })
 
                     this.pic = file.url
                 },
