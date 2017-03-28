@@ -393,7 +393,6 @@ export default {
                 //校验必填字段
                 this.$refs[ruleForm].validate((valid) => {
                     if (valid) {
-
                         if (this.ruleForm.old_book_amount == 0 && this.ruleForm.new_book_amount == 0) {
                             this.$message({
                                 message: '请填写图书数量',
@@ -401,7 +400,38 @@ export default {
                             })
                             return
                         }
-
+                        if (this.ruleForm.old_book_amount != 0) {
+                            if (!this.ruleForm.old_book_shelf_id) {
+                                this.$message({
+                                    message: '请选择二手书货架位',
+                                    type: 'warning'
+                                })
+                                return
+                            }
+                            if (!this.ruleForm.old_book_discount) {
+                                this.$message({
+                                    message: '请输入二手书折扣',
+                                    type: 'warning'
+                                })
+                                return
+                            }
+                        }
+                        if (this.ruleForm.new_book_amount != 0) {
+                            if (!this.ruleForm.new_book_shelf_id) {
+                                this.$message({
+                                    message: '请选择新书货架位',
+                                    type: 'warning'
+                                })
+                                return
+                            }
+                            if (!this.ruleForm.new_book_discount) {
+                                this.$message({
+                                    message: '请输入新书折扣',
+                                    type: 'warning'
+                                })
+                                return
+                            }
+                        }
                         // this.loading = true
                         this.loading_text = '正在上架'
 
