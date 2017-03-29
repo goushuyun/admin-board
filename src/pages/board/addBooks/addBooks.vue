@@ -276,10 +276,14 @@ export default {
             stores: [],
             new_shelves: [],
             old_shelves: [],
+
             requestData: {
               key:'',
               token: ''
             },
+
+            // 标记请求token返回的url
+            resp_image_url: '',
 
             rules: {
                 title: [{
@@ -349,7 +353,8 @@ export default {
     },
     methods: {
         handleAvatarScucess(res, file) {
-            this.ruleForm.pic = URL.createObjectURL(file.raw);
+            this.ruleForm.pic = this.resp_image_url
+            console.log(this.ruleForm.pic);
         },
         clear_input(type){
             if(type=='new'){
@@ -637,15 +642,17 @@ export default {
             */
 
             changePic() {
-                // $('#imageFile').click()
+                let key = 'book/' + this.ruleForm.isbn
 
                 //获取token
                 axios.post('/v1/mediastore/getUpToken', {
                     zone: 1,
-                    key: this.ruleForm.isbn
+                    key
                 }).then(resp => {
-                    this.requestData.key = this.ruleForm.isbn
+                    this.requestData.key = key
                     this.requestData.token = resp.data.data.token
+
+                    this.resp_image_url = resp.data.data.url
                     return true
                 }).catch(() => {
                     return false

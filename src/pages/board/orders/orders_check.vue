@@ -351,7 +351,7 @@ export default {
                 }).then(() => {
                     var adminInfo = JSON.parse(localStorage.adminInfo)
                     params.shop_id = adminInfo.shop_id,
-                    window.location.assign('http://admin.goushuyun.com/v1/orders/export_invoices?params=' + JSON.stringify(params))
+                    window.location.assign('http://admin.cumpusbox.com/v1/orders/export_invoices?params=' + JSON.stringify(params))
                 }).catch(() => {
                     self.$message({
                         message: '已取消操作！',
@@ -382,7 +382,7 @@ export default {
                 }).then(() => {
                     var adminInfo = JSON.parse(localStorage.adminInfo)
                     params.shop_id = adminInfo.shop_id,
-                    window.location.assign('http://admin.goushuyun.com/v1/orders/export_orders_for_publisher?params=' + JSON.stringify(params))
+                    window.location.assign('http://admin.cumpusbox.com/v1/orders/export_orders_for_publisher?params=' + JSON.stringify(params))
                 }).catch(() => {
                     self.$message({
                         message: '已取消操作！',
