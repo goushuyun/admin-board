@@ -1,10 +1,9 @@
 <style lang="scss" scoped>
 .box-card {
-    margin: 10px;
-    height: 600px;
-    position: relative;
+    margin-top: 10px;
+    height: 100%;
+    // min-height: 350px;
     span {
-        line-height: 14px;
         font-weight: bold;
     }
     strong {
@@ -13,38 +12,24 @@
         margin-left: 20px;
     }
     p {
-        margin: 10px;
-        line-height: 14px;
-        font-size: 14px;
-    }
-    .img {
-        margin: 10px;
-        padding: 10px;
-        img {
-            border: 1px solid;
-        }
+        line-height: 24px;
     }
     .btn {
-        margin: 10px;
         display: flex;
         align-items: center;
-        position: absolute;
-        bottom: 10px;
-        .el-button {
-            margin: 0 10px;
-        }
     }
     .progress {
-        padding: 80px;
+        padding: 70px;
         width: auto;
         text-align: center;
     }
 }
 
 #grid {
-    margin: 10px;
-    height: 400px;
-    margin: 0 auto;
+    // height: 100%;
+    max-height: 100%;
+    min-height: 350px;
+    margin-bottom: 10px;
     overflow: auto;
 }
 </style>
@@ -64,7 +49,7 @@
       </div>
       <el-card v-if="upload_status==1" class="box-card">
         <div slot="header" class="clearfix"><span>选择文件</span></div>
-        <div class="text">
+        <div>
           <p>• <a href="http://okxy9gsls.bkt.clouddn.com/uploadExcel.xlsx">下载样例文件</a></p>
           <p>• 只能上传xlsx和xls文件，且不超过2M</p>
           <p>• 出版社：请使用完整的出版社名称</p>
@@ -74,14 +59,12 @@
           <p>• 仓库名：请使用完整的仓库名</p>
           <p>• 货架名：请使用完整的货架名</p>
         </div>
-        <div class="img">
-          <img src="../../../images/example.jpg">
-        </div>
+        <img style="margin: 10px 0;border: 1px solid;" src="../../../images/example.jpg">
         <div class="btn">
-          <el-checkbox v-model="select_checked">已仔细阅读以上内容</el-checkbox>
-          <el-button type="primary" v-show="!select_checked" :disabled="true">选取文件</el-button>
+          <el-checkbox v-model="select_checked" style="margin-right:10px;">已仔细阅读以上内容</el-checkbox>
+          <el-button type="primary" size="small" v-show="!select_checked" :disabled="true">选取文件</el-button>
           <el-upload action="" :before-upload="handleFile" :show-upload-list="false" clearFiles>
-            <el-button slot="trigger" type="primary" v-show="select_checked">选取文件</el-button>
+            <el-button slot="trigger" size="small" type="primary" v-show="select_checked">选取文件</el-button>
           </el-upload>
         </div>
       </el-card>
@@ -93,9 +76,9 @@
         </div>
         <div id="grid" class="hot handsontable htRowHeaders htColumnHeaders" data-originalstyle="height: 320px; overflow: hidden; width: 584px;"></div>
         <div class="btn">
-          <el-button type="primary" v-show="check_fail.length>0" @click="checkAgain">重新校验</el-button>
-          <el-button type="primary" v-show="check_fail.length==0" @click="upload">确认上传</el-button>
-          <el-button type="warning" v-show="check_fail.length>0" @click="partUpload">直接上传</el-button>
+          <el-button type="primary" size="small" v-show="check_fail.length>0" @click="checkAgain">重新校验</el-button>
+          <el-button type="primary" size="small" v-show="check_fail.length==0" @click="upload">确认上传</el-button>
+          <el-button type="warning" size="small" v-show="check_fail.length>0" @click="partUpload">直接上传</el-button>
         </div>
       </el-card>
 
@@ -106,7 +89,7 @@
           <el-progress v-else type="circle" :width="240" :percentage="100" status="success"></el-progress>
         </div>
         <div class="btn">
-          <el-button type="success" @click="complete">完成</el-button>
+          <el-button v-show="upload_percentage==100" size="small" type="success" @click="complete">完成</el-button>
         </div>
       </el-card>
     </div>
