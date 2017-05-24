@@ -105,6 +105,7 @@ export default {
             check_loading: false,
             upload_status: 1,
             select_checked: false,
+            pre_percentage: 0,
             upload_percentage: 0,
             check_success: [],
             check_fail: [],
@@ -366,7 +367,17 @@ export default {
                 models: request_data
             }).then(resp => {
                 if (request_data.length == request_length) {
-                    this.upload_percentage += parseInt(request_length / total_count * 100)
+                    this.pre_percentage += request_length / total_count * 100
+                    var temp_percentage = parseInt(this.pre_percentage)
+                    this.upload_percentage = temp_percentage
+                    console.log('>>>>>>>>>>>>>>');
+                    console.log('pre_percentage---' + parseFloat(this.pre_percentage).toFixed(2));
+                    console.log('temp_percentage---'+ temp_percentage);
+                    console.log('upload_percentage---' + this.upload_percentage);
+                    if (temp_percentage > this.upload_percentage) {
+                        this.upload_percentage += temp_percentage
+                        // this.pre_percentage = 0
+                    }
                     this.comfirmUpload(data, total_count)
                 } else {
                     this.upload_percentage = 100
@@ -377,6 +388,7 @@ export default {
             this.upload_status = 1
             this.select_checked = false
             this.upload_percentage = 0
+            this.pre_percentage = 0
             this.check_success = []
             this.check_fail = []
             this.hot = {}
