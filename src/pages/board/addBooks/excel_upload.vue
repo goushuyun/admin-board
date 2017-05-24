@@ -70,7 +70,7 @@
       </el-card>
 
       <el-card v-if="upload_status==2" v-loading="check_loading" class="box-card">
-        <div slot="header" class="clearfix"><span>校验结果</span><strong>{{'（'+check_success.length+'条数据校验成功；'+(check_fail.length)+'条数据校验失败！）'}}</strong></div>
+        <div slot="header" class="clearfix"><span>校验结果</span><strong>{{'（'+check_success.length+'条数据校验成功；'+(check_fail.length - 1)+'条数据校验失败！）'}}</strong></div>
         <div class="" v-show="check_fail.length>0">
           <el-alert title="以下为校验失败的数据，您可以参考每行末尾的“错误提示”直接在当前页面进行修改并“重新校验”，也可以选择放弃下方的错误数据“直接上传”。" type="error" show-icon></el-alert>
         </div>
@@ -83,7 +83,7 @@
       </el-card>
 
       <el-card v-if="upload_status==3" class="box-card">
-        <div v-if="upload_percentage == 100" slot="header" class="clearfix"><span>上传完成</span><strong>{{'（'+check_success.length+'条数据上传成功；'+(check_fail.length)+'条数据上传失败！）'}}</strong></div>
+        <div v-if="upload_percentage == 100" slot="header" class="clearfix"><span>上传完成</span><strong>{{'（'+check_success.length+'条数据上传成功；'+(check_fail.length - 1)+'条数据上传失败！）'}}</strong></div>
         <div v-else slot="header" class="clearfix"><span>上传中，请耐心等待，不要关闭此页面</span></div>
         <div class="progress">
           <el-progress v-if="upload_percentage!=100" type="circle" :width="240" :percentage="upload_percentage"></el-progress>
@@ -357,7 +357,7 @@ export default {
                 request_data = data.slice(0, request_length)
                 data.splice(0, request_length)
             } else {
-                request_data = data.slice(i, data_length)
+                request_data = data.slice(0, data_length)
                 data.splice(0, data_length)
             }
             console.log(request_data);
@@ -366,7 +366,7 @@ export default {
                 models: request_data
             }).then(resp => {
                 if (request_data.length == request_length) {
-                    this.upload_percentage += parseInt(request_length / total_count)
+                    this.upload_percentage += parseInt(request_length / total_count * 100)
                     this.comfirmUpload(data, total_count)
                 } else {
                     this.upload_percentage = 100
