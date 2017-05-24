@@ -343,10 +343,11 @@ export default {
             var self = this
             self.upload_status = 3
             var data = self.array2json(self.check_success)
-            for (var i = 0, len = data.length; i < len; i += 500) {
-                if (i + 500 <= len) {
+            var request_length = 20
+            for (var i = 0, len = data.length; i < len; i += request_length) {
+                if (i + request_length <= len) {
                     var request_data = {
-                        models: data.slice(i, i + 500)
+                        models: data.slice(i, i + request_length)
                     }
                 } else {
                     var request_data = {
@@ -357,8 +358,8 @@ export default {
                 //DO SOMETHING WITH REQUEST
                 axios.post('/v1/books/upload_goods_by_excel', request_data)
                     .then(resp => {
-                        if (request_data.length == 500) {
-                            self.upload_percentage += parseInt(500 / len)
+                        if (request_data.length == request_length) {
+                            self.upload_percentage += parseInt(request_length / len)
                         } else {
                             self.upload_percentage = 100
                         }
