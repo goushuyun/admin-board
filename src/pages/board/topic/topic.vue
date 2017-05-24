@@ -15,6 +15,8 @@
     </el-row>
 
     <el-table style="width: 100%" :data="topics">
+        <el-table-column type="index" width="50">
+        </el-table-column>
         <el-table-column prop="title" label="专题名" width="180">
         </el-table-column>
         <el-table-column prop="total" label="书籍数量">

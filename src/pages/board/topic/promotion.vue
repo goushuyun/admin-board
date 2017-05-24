@@ -4,6 +4,10 @@
     margin-bottom: 6px;
 }
 
+.pagination {
+    margin-top: 12px;
+}
+
 </style>
 
 <template lang="html">
@@ -30,6 +34,8 @@
     </el-form>
 
     <el-table style="width: 100%" :data="goods" v-loading.body="loading">
+        <el-table-column type="index" width="50">
+        </el-table-column>
         <el-table-column label="ISBN" min-width="140" prop="isbn">
         </el-table-column>
         <el-table-column label="书名" width="180" prop="book.title">
@@ -49,6 +55,12 @@
         </el-table-column>
     </el-table>
 
+    <!-- 分页 -->
+    <div class="pagination">
+        <el-pagination :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+        </el-pagination>
+    </div>
+
 </div>
 
 </template>
@@ -60,47 +72,32 @@ import {
     isISBNFormat
 }
 from "../../../scripts/utils"
+import mix from './promotion.js'
+
 export default {
+    mixins: [mix],
     created() {
-            //拿到话题的ID，推荐状态
-            let topic_id = this.$route.params.topic_id,
-                title = this.$route.params.title
-            let recommend = this.$route.params.recommend
+        //拿到话题的ID，推荐状态
+        let topic_id = this.$route.params.topic_id,
+            title = this.$route.params.title
+        let recommend = this.$route.params.recommend
 
-            console.log(topic_id + '-----' + recommend)
+        console.log(topic_id + '-----' + recommend)
 
+        if (topic_id == undefined) {
+            //新加topic
+            console.log('the topic_id is null')
 
+        } else {
+            this.topic_id = topic_id
+            this.title = title
+            this.recommend = recommend
 
-            if (topic_id == undefined) {
-                //新加topic
-                console.log('the topic_id is null')
+            //编辑话题，获取该话题的所有商品数据
+            this.getTopicData()
+        }
 
-
-            } else {
-                this.topic_id = topic_id
-                this.title = title
-                this.recommend = recommend
-                    //编辑话题，获取该话题的说有商品数据
-                console.log('the topic_id is ' + topic_id)
-                let data = {
-                    page: 1,
-                    size: 15,
-                    topic_id
-                }
-
-                axios.post('/v1/books/checkStore', data).then(resp => {
-                    if (resp.data.code = '00000') {
-                        this.goods = resp.data.data.map(el => {
-                            el.book.price = (el.book.price_int / 100).toFixed(2)
-                            return el
-                        })
-                    }
-                })
-
-            }
-
-            console.log(topic_id)
-        },
+    },
 
         methods: {
             //检查该商品是否符合设置为未推荐状态的标准(所有书籍均为未推荐)
@@ -204,17 +201,6 @@ export default {
                 },
 
                 search() {
-                    //一个话题内商品数量限制在15本内
-                    if (this.goods.length > 15) {
-                        this.$message({
-                            message: '一个话题内的书本数量不能超过 15 本',
-                            type: 'warning'
-                        })
-
-                        return
-                    }
-
-
                     //isbn为空
                     if (!isISBNFormat(this.isbn)) {
                         this.$message({
@@ -224,6 +210,10 @@ export default {
 
                         return
                     }
+
+                    // 检查该 isbn 所对应的商品在话题中是否已经存在
+                    
+
 
                     this.loading = true
                     let data = {
@@ -288,7 +278,13 @@ export default {
                 goods: [],
                 loading: false,
 
-                topic_id: ''
+                topic_id: '',
+
+                // 分页请求话题数据
+                page: 1,
+                size: 10,
+                total: 0
+
             }
         }
 }

@@ -279,9 +279,22 @@ export default {
                         if(resp.data.code == '00000'){
                             this.getData()
                             console.log('upload image ok !');
+
+                            // notify server to refresh urls
+                            let urls = {
+                                urls : [this.upload_data.url]
+                            }
+                            axios.post('/v1/mediastore/refresh_urls', urls).then(res=>{
+                                if(res.data.code == '00000'){
+                                    console.log('refresh_urls success');
+                                }
+                            })
+
                         }
                     })
+                    console.log('lai');
 
+                    console.log(file.url);
                     this.pic = file.url
                 },
                 choosePicStatus() {
