@@ -183,7 +183,7 @@ export default {
                 obj.message = 'ISBN错误'
                 return obj
             } else {
-                var isbn = array[0].replace(new RegExp("-","gm"),"").trim()
+                var isbn = array[0].replace(new RegExp("-", "gm"), "").trim()
                 if (isbn.length != 10 && isbn.length != 13) {
                     obj.success = false
                     obj.message = 'ISBN错误'
@@ -195,7 +195,7 @@ export default {
                 obj.message = '书名错误'
                 return obj
             } else {
-                if (array[1].trim().length >30) {
+                if (array[1].trim().length > 30) {
                     obj.success = false
                     obj.message = '书名错误'
                     return obj
@@ -310,7 +310,7 @@ export default {
                     }
                 })
                 var obj = {
-                    isbn: arr[0].replace(new RegExp("-","gm"),"").trim(),
+                    isbn: arr[0].replace(new RegExp("-", "gm"), "").trim(),
                     title: arr[1],
                     publisher: arr[2],
                     author: arr[3],
@@ -344,29 +344,34 @@ export default {
             var self = this
             self.upload_status = 3
             var data = self.array2json(self.check_success)
-            var request_length = 20
-            for (var i = 0, len = data.length; i < len; i += request_length) {
-                if (i + request_length <= len) {
-                    var request_data = {
-                        models: data.slice(i, i + request_length)
-                    }
-                } else {
-                    var request_data = {
-                        models: data.slice(i, len)
-                    }
-                }
-                console.log(request_data);
-                //DO SOMETHING WITH REQUEST
-                axios.post('/v1/books/upload_goods_by_excel', request_data)
-                    .then(resp => {
-                        if (request_data.length == request_length) {
-                            self.upload_percentage += parseInt(request_length / len)
-                        } else {
-                            self.upload_percentage = 100
-                        }
-                    })
+            self.comfirmUpload(data, data.length)
+        },
+        comfirmUpload(data, total_count) {
+            if (data.length == 0) {
+                return
             }
-
+            var request_length = 20
+            var data_length = data.length
+            var request_data = {}
+            if (request_length <= data_length) {
+                request_data = data.slice(0, request_length)
+                data.splice(0, request_length)
+            } else {
+                request_data = data.slice(i, data_length)
+                data.splice(0, data_length)
+            }
+            console.log(request_data);
+            //DO SOMETHING WITH REQUEST
+            axios.post('/v1/books/upload_goods_by_excel', {
+                models: request_data
+            }).then(resp => {
+                if (request_data.length == request_length) {
+                    this.upload_percentage += parseInt(request_length / total_count)
+                    this.comfirmUpload(data, total_count)
+                } else {
+                    this.upload_percentage = 100
+                }
+            })
         },
         complete() {
             this.upload_status = 1
