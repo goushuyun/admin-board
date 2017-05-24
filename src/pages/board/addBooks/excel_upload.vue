@@ -361,23 +361,13 @@ export default {
                 request_data = data.slice(0, data_length)
                 data.splice(0, data_length)
             }
-            console.log(request_data);
             //DO SOMETHING WITH REQUEST
             axios.post('/v1/books/upload_goods_by_excel', {
                 models: request_data
             }).then(resp => {
                 if (request_data.length == request_length) {
                     this.pre_percentage += request_length / total_count * 100
-                    var temp_percentage = parseInt(this.pre_percentage)
-                    this.upload_percentage = temp_percentage
-                    console.log('>>>>>>>>>>>>>>');
-                    console.log('pre_percentage---' + parseFloat(this.pre_percentage).toFixed(2));
-                    console.log('temp_percentage---'+ temp_percentage);
-                    console.log('upload_percentage---' + this.upload_percentage);
-                    if (temp_percentage > this.upload_percentage) {
-                        this.upload_percentage += temp_percentage
-                        // this.pre_percentage = 0
-                    }
+                    this.upload_percentage = parseInt(this.pre_percentage)
                     this.comfirmUpload(data, total_count)
                 } else {
                     this.upload_percentage = 100
