@@ -83,7 +83,7 @@
       </el-card>
 
       <el-card v-if="upload_status==3" class="box-card">
-        <div v-if="upload_percentage == 100" slot="header" class="clearfix"><span>上传完成</span><strong>{{'（'+check_success.length+'条数据上传成功；'+(check_fail.length - 1)+'条数据上传失败！）'}}</strong></div>
+        <div v-if="upload_percentage == 100" slot="header" class="clearfix"><span>上传完成</span><strong>{{'（'+check_success.length+'条数据上传成功'}}</strong></div>
         <div v-else slot="header" class="clearfix"><span>上传中，请耐心等待，不要关闭此页面</span></div>
         <div class="progress">
           <el-progress v-if="upload_percentage!=100" type="circle" :width="240" :percentage="upload_percentage"></el-progress>
