@@ -321,7 +321,7 @@ export default {
                             store_id: this.store_id,
                             shelf_id: this.shelf_id,
                             amount: this.dialog_goods.amount,
-                            selling_price: parseInt(this.dialog_goods.selling_price * 100),
+                            selling_price: parseInt((this.dialog_goods.selling_price * 100).toPrecision(4)),
                             category: this.dialog_goods.category
                         }
 
