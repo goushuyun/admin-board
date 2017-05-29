@@ -302,13 +302,13 @@ export default {
                 },
                 confirmModify() {
                     //校验弹框中的数据，库位选填
-                    if ((typeof this.dialog_goods.selling_price) == 'string') {
-                        this.$message({
-                            message: '图书价格类型不正确',
-                            type: 'warning'
-                        });
-                        return
-                    }
+                    // if ((typeof this.dialog_goods.selling_price) == 'string') {
+                    //     this.$message({
+                    //         message: '图书价格类型不正确',
+                    //         type: 'warning'
+                    //     });
+                    //     return
+                    // }
 
                     //检查数据是否更新
                     if (this.store_id != this.backup_data.store_id || this.shelf_id != this.backup_data.shelf_id || this.backup_data.amount != this.dialog_goods.amount || this.backup_data.selling_price != this.dialog_goods.selling_price || this.backup_data.category != this.dialog_goods.category) {
