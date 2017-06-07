@@ -50,10 +50,10 @@ div.content {
     <div class="search_item">
         <el-form :inline="true">
             <el-form-item label="书名">
-                <el-input v-model="title" size="small"></el-input>
+                <el-input v-model.trim="title" @keyup.enter.native="getData" size="small"></el-input>
             </el-form-item>
             <el-form-item label="ISBN">
-                <el-input v-model="isbn" size="small"></el-input>
+                <el-input v-model.trim="isbn" size="small" @keyup.enter.native="getData"></el-input>
             </el-form-item>
             <el-form-item label="图书类型">
                 <el-select v-model="type" @change="getData" size="small">
@@ -108,7 +108,7 @@ div.content {
             <el-table-column label="操作" fixed="right">
                 <template scope="scope">
                     <el-button type="text" size="small" @click="modify(scope.$index)" icon="edit"></el-button>
-                    <el-button type="text" size="small" @click="delGoods(scope.$index)" icon="delete"></el-button>
+                    <el-button type="text" style="color: #FF4949;" size="small" @click="delGoods(scope.$index)" icon="delete"></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -321,7 +321,7 @@ export default {
                             store_id: this.store_id,
                             shelf_id: this.shelf_id,
                             amount: this.dialog_goods.amount,
-                            selling_price: parseInt((this.dialog_goods.selling_price * 100).toPrecision(4)),
+                            selling_price: parseInt((this.dialog_goods.selling_price * 100).toFixed()),
                             category: this.dialog_goods.category
                         }
 

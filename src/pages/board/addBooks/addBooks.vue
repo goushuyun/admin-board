@@ -446,14 +446,14 @@ export default {
                                 shelf_id: this.ruleForm.new_book_shelf_id,
                                 store_id: this.ruleForm.new_book_store_id,
                                 amount: this.ruleForm.new_book_amount,
-                                selling_price: parseInt((this.new_book_price * 100).toPrecision(4))
+                                selling_price: parseInt((this.new_book_price * 100).toFixed())
                             },
                             old_book = {
                                 type: 2,
                                 shelf_id: this.ruleForm.old_book_shelf_id,
                                 store_id: this.ruleForm.old_book_store_id,
                                 amount: this.ruleForm.old_book_amount,
-                                selling_price: parseInt((this.old_book_price * 100).toPrecision(4))
+                                selling_price: parseInt((this.old_book_price * 100).toFixed())
                             }
 
                         new_book.isbn = old_book.isbn = this.ruleForm.isbn
@@ -495,7 +495,7 @@ export default {
                         book.isbn = this.ruleForm.isbn
                         book.pic = this.ruleForm.pic
                         book.author = this.ruleForm.author
-                        book.price_int = parseInt((this.ruleForm.price * 100).toPrecision(4))
+                        book.price_int = parseInt((this.ruleForm.price * 100).toFixed())
 
                         //检查标准图书信息是否有变化
                         if (this.preBook.title != book.title || this.preBook.publisher != book.publisher || this.preBook.pic != book.pic || this.preBook.author != book.author || parseInt(this.preBook.price) != book.price_int) {
