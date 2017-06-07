@@ -1,5 +1,7 @@
 <style lang="scss" scoped>
 
+@import "./store_check.scss";
+
 div.content {
     .btn_bottom {
         height: 72px;
@@ -89,6 +91,15 @@ div.content {
         <el-table :data="tableData" stripe style="width: 100%">
             <el-table-column type="index" width="56" label="">
             </el-table-column>
+            <!-- book image -->
+            <el-table-column label="图片" width="100">
+                <template scope="scope">
+                    <div class="image_wrap">
+                        <img class="book_img" :src="scope.row.book.pic" alt="">
+                    </div>
+                </template>
+            </el-table-column>
+
             <el-table-column prop="isbn" label="ISBN" width="150">
             </el-table-column>
             <el-table-column prop="book.title" label="书名" width="170">
