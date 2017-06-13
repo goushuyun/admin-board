@@ -362,7 +362,7 @@ function getDate() {
     oDate.getDate(); // 获取系统日，
     oDate.getHours(); //获取系统时，
     oDate.getMinutes(); //分
-    return oDate.getFullYear() + "/" + oDate.getMonth() + 1 + "/" + oDate.getDate() + " " + oDate.getHours() + ":" + oDate.getMinutes()
+    return oDate.getFullYear() + "/" + (oDate.getMonth() + 1) + "/" + oDate.getDate() + " " + oDate.getHours() + ":" + oDate.getMinutes()
 }
 
 function orderPromiseFunc(serverData) {
